@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using WebApi.Helpers;
 using WebApi.Middleware;
 using WebApi.Services;
@@ -20,13 +19,13 @@ namespace WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("WebApiDatabase")));
+            services.AddDbContext<DataContext>(options => options
+                .UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"))
+                .UseLazyLoadingProxies()
+            );
 
             services.AddCors();
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSwaggerGen();
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));

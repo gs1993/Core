@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,15 +13,12 @@ namespace WebApi.Controllers
     public class AccountsController : BaseController
     {
         private readonly IAccountService _accountService;
-        private readonly IMapper _mapper;
 
-        public AccountsController(
-            IAccountService accountService,
-            IMapper mapper)
+        public AccountsController(IAccountService accountService)
         {
             _accountService = accountService;
-            _mapper = mapper;
         }
+
 
         [HttpPost("authenticate")]
         public ActionResult<AuthenticateResponse> Authenticate(AuthenticateRequest model)
@@ -130,10 +126,6 @@ namespace WebApi.Controllers
             if (id != Account.Id && Account.Role != Role.Admin)
                 return Unauthorized(new { message = "Unauthorized" });
 
-            // only admins can update role
-            if (Account.Role != Role.Admin)
-                model.Role = null;
-
             var account = _accountService.Update(id, model);
             return Ok(account);
         }
@@ -150,7 +142,6 @@ namespace WebApi.Controllers
             return Ok(new { message = "Account deleted successfully" });
         }
 
-        // helper methods
 
         private void setTokenCookie(string token)
         {
