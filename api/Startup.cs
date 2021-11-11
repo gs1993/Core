@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
 using WebApi.Helpers;
 using WebApi.Middleware;
 using WebApi.Services;
@@ -25,7 +26,10 @@ namespace WebApi
             );
 
             services.AddCors();
-            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
+            services.AddControllers().AddJsonOptions(x => {
+                x.JsonSerializerOptions.IgnoreNullValues = true;
+                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
             services.AddSwaggerGen();
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));

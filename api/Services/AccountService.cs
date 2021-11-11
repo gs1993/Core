@@ -25,9 +25,10 @@ namespace WebApi.Services
         void ValidateResetToken(ValidateResetTokenRequest model);
         void ResetPassword(ResetPasswordRequest model);
         IEnumerable<AccountResponse> GetAll();
-        AccountResponse GetById(int id);
-        AccountResponse Update(int id, UpdateRequest model);
-        void Delete(int id);
+        AccountResponse GetById(long id);
+        AccountResponse Update(long id, UpdateRequest model);
+        void Delete(long id);
+        void ChangeRole(long id, Role role);
     }
 
     public class AccountService : IAccountService
@@ -188,13 +189,13 @@ namespace WebApi.Services
             return accounts.Select(x => AccountResponse.CreateFromModel(x));
         }
 
-        public AccountResponse GetById(int id)
+        public AccountResponse GetById(long id)
         {
             var account = GetAccount(id);
             return AccountResponse.CreateFromModel(account);
         }
 
-        public AccountResponse Update(int id, UpdateRequest model)
+        public AccountResponse Update(long id, UpdateRequest model)
         {
             var account = GetAccount(id);
 
@@ -209,15 +210,22 @@ namespace WebApi.Services
             return AccountResponse.CreateFromModel(account);
         }
 
-        public void Delete(int id)
+        public void Delete(long id)
         {
             var account = GetAccount(id);
             account.Delete(DateTime.UtcNow);
             _context.SaveChanges();
         }
 
+        public void ChangeRole(long id, Role role)
+        {
+            var account = GetAccount(id);
+            account.ChangeRole(role);
+            _context.SaveChanges();
+        }
 
-        private Account GetAccount(int id)
+
+        private Account GetAccount(long id)
         {
             var account = _context.Accounts.Find(id);
             if (account == null) 

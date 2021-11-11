@@ -30,22 +30,26 @@ namespace WebApi.Middleware
             {
                 var response = context.Response;
                 response.ContentType = "application/json";
+                string errorMessage;
 
                 switch(error)
                 {
                     case AppException:
                         response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        errorMessage = error.Message;
                         break;
                     case KeyNotFoundException:
                         response.StatusCode = (int)HttpStatusCode.NotFound;
+                        errorMessage = error.Message;
                         break;
                     default:
                         _logger.LogError(error, error.Message);
                         response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        errorMessage = "Internal server error";
                         break;
                 }
 
-                var result = JsonSerializer.Serialize(new { message = error?.Message });
+                var result = JsonSerializer.Serialize(new { message = errorMessage });
                 await response.WriteAsync(result);
             }
         }

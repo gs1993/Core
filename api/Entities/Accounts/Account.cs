@@ -80,5 +80,10 @@ namespace WebApi.Entities.Accounts
                 LastUpdateDate = updateDate;
             }
         }
+
+        public void ChangeRole(Role role)
+        {
+            Role = role;
+        }
     }
 }

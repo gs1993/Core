@@ -133,6 +133,14 @@ namespace WebApi.Controllers
             return Ok(new { message = "Account deleted successfully" });
         }
 
+        [Authorize(Role.Admin)]
+        [HttpPut("change-role/{id:int}")]
+        public IActionResult ChangeRole(ChangeRole model)
+        {
+            _accountService.ChangeRole(model.Id, model.Role);
+            return Ok(new { message = "Role changed successfully" });
+        }
+
 
         private void SetTokenCookie(string token)
         {
