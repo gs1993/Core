@@ -1,4 +1,4 @@
-namespace WebApi.Models.Accounts
+namespace WebApi.Dto.Accounts
 {
     public class RevokeTokenRequest
     {

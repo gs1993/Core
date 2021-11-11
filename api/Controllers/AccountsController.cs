@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using WebApi.Entities;
-using WebApi.Models.Accounts;
+using WebApi.Dto.Accounts;
+using WebApi.Entities.Accounts;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -23,8 +23,8 @@ namespace WebApi.Controllers
         [HttpPost("authenticate")]
         public ActionResult<AuthenticateResponse> Authenticate(AuthenticateRequest model)
         {
-            var response = _accountService.Authenticate(model, ipAddress());
-            setTokenCookie(response.RefreshToken);
+            var response = _accountService.Authenticate(model, IpAddress());
+            SetTokenCookie(response.RefreshToken);
             return Ok(response);
         }
 
@@ -32,8 +32,8 @@ namespace WebApi.Controllers
         public ActionResult<AuthenticateResponse> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            var response = _accountService.RefreshToken(refreshToken, ipAddress());
-            setTokenCookie(response.RefreshToken);
+            var response = _accountService.RefreshToken(refreshToken, IpAddress());
+            SetTokenCookie(response.RefreshToken);
             return Ok(response);
         }
 
@@ -41,17 +41,16 @@ namespace WebApi.Controllers
         [HttpPost("revoke-token")]
         public IActionResult RevokeToken(RevokeTokenRequest model)
         {
-            // accept token from request body or cookie
             var token = model.Token ?? Request.Cookies["refreshToken"];
 
             if (string.IsNullOrEmpty(token))
                 return BadRequest(new { message = "Token is required" });
 
             // users can revoke their own tokens and admins can revoke any tokens
-            if (!Account.OwnsToken(token) && Account.Role != Role.Admin)
+            if (Account != null && !Account.OwnsToken(token) && Account.Role != Role.Admin)
                 return Unauthorized(new { message = "Unauthorized" });
 
-            _accountService.RevokeToken(token, ipAddress());
+            _accountService.RevokeToken(token, IpAddress());
             return Ok(new { message = "Token revoked" });
         }
 
@@ -110,14 +109,6 @@ namespace WebApi.Controllers
             return Ok(account);
         }
 
-        [Authorize(Role.Admin)]
-        [HttpPost]
-        public ActionResult<AccountResponse> Create(CreateRequest model)
-        {
-            var account = _accountService.Create(model);
-            return Ok(account);
-        }
-
         [Authorize]
         [HttpPut("{id:int}")]
         public ActionResult<AccountResponse> Update(int id, UpdateRequest model)
@@ -143,7 +134,7 @@ namespace WebApi.Controllers
         }
 
 
-        private void setTokenCookie(string token)
+        private void SetTokenCookie(string token)
         {
             var cookieOptions = new CookieOptions
             {
@@ -153,7 +144,7 @@ namespace WebApi.Controllers
             Response.Cookies.Append("refreshToken", token, cookieOptions);
         }
 
-        private string ipAddress()
+        private string IpAddress()
         {
             if (Request.Headers.ContainsKey("X-Forwarded-For"))
                 return Request.Headers["X-Forwarded-For"];

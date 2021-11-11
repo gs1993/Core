@@ -46,11 +46,11 @@ namespace WebApi.Middleware
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var accountId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                var accountId = long.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
                 context.Items["Account"] = await dataContext.Accounts.FindAsync(accountId);
             }
-            catch 
+            catch
             {
                 // do nothing if jwt validation fails
                 // account is not attached to context so request won't have access to secure routes

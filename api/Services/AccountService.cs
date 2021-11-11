@@ -8,9 +8,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using WebApi.Entities;
 using WebApi.Helpers;
-using WebApi.Models.Accounts;
+using WebApi.Dto.Accounts;
+using WebApi.Entities.Accounts;
 
 namespace WebApi.Services
 {
@@ -26,7 +26,6 @@ namespace WebApi.Services
         void ResetPassword(ResetPasswordRequest model);
         IEnumerable<AccountResponse> GetAll();
         AccountResponse GetById(int id);
-        AccountResponse Create(CreateRequest model);
         AccountResponse Update(int id, UpdateRequest model);
         void Delete(int id);
     }
@@ -37,10 +36,7 @@ namespace WebApi.Services
         private readonly AppSettings _appSettings;
         private readonly IEmailService _emailService;
 
-        public AccountService(
-            DataContext context,
-            IOptions<AppSettings> appSettings,
-            IEmailService emailService)
+        public AccountService(DataContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
         {
             _context = context;
             _appSettings = appSettings.Value;
@@ -56,29 +52,16 @@ namespace WebApi.Services
                 throw new ArgumentNullException(nameof(ipAddress));
 
             var account = _context.Accounts.SingleOrDefault(x => x.Email == model.Email);
-            if (account == null || !account.IsVerified || !BC.Verify(model.Password, account.PasswordHash))
+            if (account == null || !account.IsVerified || !BC.Verify(model.Password, account.Password.PasswordHash))
                 throw new AppException("Email or password is incorrect");
 
             var refreshToken = GenerateRefreshToken(ipAddress);
-            account.AddRefreshTokenAndRemoveOldTokens(refreshToken, DateTime.UtcNow, _appSettings.RefreshTokenTTL);
+            account.AddRefreshTokenAndRemoveOldTokens(refreshToken, DateTime.UtcNow, _appSettings.RefreshTokenTtlInDays);
             _context.Update(account);
             _context.SaveChanges();
 
             var jwtToken = GenerateJwtToken(account);
-            return new AuthenticateResponse
-            {
-                Id = account.Id,
-                Created = account.Created,
-                Email = account.Email,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                IsVerified = account.IsVerified,
-                Role = account.Role.ToString(),
-                Title = account.Title,
-                Updated = account.Updated,
-                JwtToken = jwtToken,
-                RefreshToken = refreshToken.Token
-            };
+            return AuthenticateResponse.CreateFromModel(account, jwtToken, refreshToken.Token);
         }
 
         public AuthenticateResponse RefreshToken(string token, string ipAddress)
@@ -91,26 +74,13 @@ namespace WebApi.Services
             var (refreshToken, account) = GetRefreshToken(token);
             var newRefreshToken = GenerateRefreshToken(ipAddress);
             refreshToken.Revoke(DateTime.UtcNow, ipAddress, newRefreshToken.Token);
-            account.AddRefreshTokenAndRemoveOldTokens(newRefreshToken, DateTime.UtcNow, _appSettings.RefreshTokenTTL);
+            account.AddRefreshTokenAndRemoveOldTokens(newRefreshToken, DateTime.UtcNow, _appSettings.RefreshTokenTtlInDays);
 
             _context.Update(account);
             _context.SaveChanges();
 
             var jwtToken = GenerateJwtToken(account);
-            return new AuthenticateResponse
-            {
-                Id = account.Id,
-                Created = account.Created,
-                Email = account.Email,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                IsVerified = account.IsVerified,
-                Role = account.Role.ToString(),
-                Title = account.Title,
-                Updated = account.Updated,
-                JwtToken = jwtToken,
-                RefreshToken = refreshToken.Token
-            };
+            return AuthenticateResponse.CreateFromModel(account, jwtToken, refreshToken.Token);
         }
 
         public void RevokeToken(string token, string ipAddress)
@@ -123,18 +93,32 @@ namespace WebApi.Services
 
         public void Register(RegisterRequest model, string origin)
         {
-            //TODO: Arg validation
-
             if (_context.Accounts.Any(x => x.Email == model.Email))
             {
                 SendAlreadyRegisteredEmail(model.Email, origin);
                 return;
             }
 
-            string passwordHash = BC.HashPassword(model.Password);
-            var role = _context.Accounts.Any() ? Role.Admin : Role.User;
+            var nameResult = Name.Create(model.Title, model.FirstName, model.LastName);
+            if (nameResult.IsFailure)
+                throw new AppException(nameResult.Error);
+
+            var emailResult = Email.Create(model.Email);
+            if (emailResult.IsFailure)
+                throw new AppException(emailResult.Error);
+
+            string passwordSalt = BC.GenerateSalt();
+            string passwordHash = BC.HashPassword(model.Password, passwordSalt);
+            var passwordResult = Password.Create(passwordHash, passwordSalt);
+            if (passwordResult.IsFailure)
+                throw new AppException(passwordResult.Error);
+
             string verificationToken = RandomTokenString();
-            var createAccountResult = Account.Create(model.Title, model.FirstName, model.LastName, model.Email, passwordHash, model.AcceptTerms, role, verificationToken, DateTime.UtcNow);
+
+            var role = _context.Accounts.Any() ? Role.User : Role.Admin;
+
+            var createAccountResult = Account.Create(nameResult.Value, emailResult.Value,
+                passwordResult.Value, role, verificationToken, DateTime.UtcNow);
             if (createAccountResult.IsFailure)
                 throw new AppException(createAccountResult.Error);
 
@@ -185,9 +169,14 @@ namespace WebApi.Services
             if (account == null)
                 throw new AppException("Invalid token");
 
+            string newPasswordSalt = BC.GenerateSalt();
             string newPasswordHash = BC.HashPassword(model.Password);
+            var passwordResult = Password.Create(newPasswordHash, newPasswordSalt);
+            if (passwordResult.IsFailure)
+                throw new AppException(passwordResult.Error);
+
             var passwordResetDate = DateTime.UtcNow;
-            account.ResetPassword(newPasswordHash, passwordResetDate);
+            account.ResetPassword(passwordResult.Value, passwordResetDate);
             
             _context.Accounts.Update(account);
             _context.SaveChanges();
@@ -196,92 +185,34 @@ namespace WebApi.Services
         public IEnumerable<AccountResponse> GetAll()
         {
             var accounts = _context.Accounts;
-            return accounts.Select(x => new AccountResponse 
-            {
-                Created = x.Created,
-                Email = x.Email,
-                Id = x.Id,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                IsVerified = x.IsVerified,
-                Role = x.Role.ToString(),
-                Title = x.Title,
-                Updated = x.Updated
-            });
+            return accounts.Select(x => AccountResponse.CreateFromModel(x));
         }
 
         public AccountResponse GetById(int id)
         {
             var account = GetAccount(id);
-            return new AccountResponse
-            {
-                Created = account.Created,
-                Email = account.Email,
-                Id = account.Id,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                IsVerified = account.IsVerified,
-                Role = account.Role.ToString(),
-                Title = account.Title,
-                Updated = account.Updated
-            };
-        }
-
-        public AccountResponse Create(CreateRequest model)
-        {
-            if (_context.Accounts.Any(x => x.Email == model.Email))
-                throw new AppException($"Email '{model.Email}' is already registered");
-
-            string passwordHash = BC.HashPassword(model.Password);
-            var role = _context.Accounts.Any() ? Role.Admin : Role.User;
-            string verificationToken = RandomTokenString();
-            var createAccountResult = Account.Create(model.Title, model.FirstName, model.LastName, model.Email, passwordHash, false, role, verificationToken, DateTime.UtcNow);
-            if (createAccountResult.IsFailure)
-                throw new AppException(createAccountResult.Error);
-
-            var account = createAccountResult.Value;
-            _context.Accounts.Add(account);
-            _context.SaveChanges();
-
-            return new AccountResponse
-            {
-                Created = account.Created,
-                Email = account.Email,
-                Title = account.Title,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                Id = account.Id,
-                IsVerified = account.IsVerified,
-                Role = account.Role.ToString(),
-                Updated = account.Updated
-            };
+            return AccountResponse.CreateFromModel(account);
         }
 
         public AccountResponse Update(int id, UpdateRequest model)
         {
             var account = GetAccount(id);
-            account.Update(model.Title, model.FirstName, model.LastName, DateTime.UtcNow);
+
+            var newNameResult = Name.Create(model.Title, model.FirstName, model.LastName);
+            if (newNameResult.IsFailure)
+                throw new AppException(newNameResult.Error);
+
+            account.Update(newNameResult.Value, DateTime.UtcNow);
             _context.Accounts.Update(account);
             _context.SaveChanges();
 
-            return new AccountResponse
-            {
-                Created = account.Created,
-                Email = account.Email,
-                Title = account.Title,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                Id = account.Id,
-                IsVerified = account.IsVerified,
-                Role = account.Role.ToString(),
-                Updated = account.Updated
-            };
+            return AccountResponse.CreateFromModel(account);
         }
 
         public void Delete(int id)
         {
             var account = GetAccount(id);
-            _context.Accounts.Remove(account);
+            account.Delete(DateTime.UtcNow);
             _context.SaveChanges();
         }
 
@@ -321,13 +252,12 @@ namespace WebApi.Services
 
         private RefreshToken GenerateRefreshToken(string ipAddress)
         {
-            return new RefreshToken
-            {
-                Token = RandomTokenString(),
-                Expires = DateTime.UtcNow.AddDays(7),
-                Created = DateTime.UtcNow,
-                CreatedByIp = ipAddress
-            };
+            var refreshTokenResult = Entities.Accounts.RefreshToken.Create(
+                RandomTokenString(), DateTime.UtcNow, DateTime.UtcNow.AddDays(7), ipAddress);
+            if (refreshTokenResult.IsFailure)
+                throw new AppException(refreshTokenResult.Error);
+
+            return refreshTokenResult.Value;
         }
 
         private string RandomTokenString()

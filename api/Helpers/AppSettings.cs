@@ -1,17 +1,18 @@
 namespace WebApi.Helpers
 {
-    public class AppSettings
+    public record AppSettings
     {
-        public string Secret { get; set; }
+        public string Secret { get; init; }
+        public int RefreshTokenTtlInDays { get; init; }
+        public EmailSettings EmailSettings { get; set; }
+    }
 
-        // refresh token time to live (in days), inactive tokens are
-        // automatically deleted from the database after this time
-        public int RefreshTokenTTL { get; set; }
-
-        public string EmailFrom { get; set; }
-        public string SmtpHost { get; set; }
-        public int SmtpPort { get; set; }
-        public string SmtpUser { get; set; }
-        public string SmtpPass { get; set; }
+    public record EmailSettings
+    {
+        public string EmailFrom { get; init; }
+        public string SmtpHost { get; init; }
+        public int SmtpPort { get; init; }
+        public string SmtpUser { get; init; }
+        public string SmtpPass { get; init; }
     }
 }
