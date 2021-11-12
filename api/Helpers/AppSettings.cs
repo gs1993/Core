@@ -3,6 +3,7 @@ namespace WebApi.Helpers
     public record AppSettings
     {
         public string Secret { get; init; }
+        public int ExpirationTimeInMinutes { get; init; }
         public int RefreshTokenTtlInDays { get; init; }
         public EmailSettings EmailSettings { get; set; }
     }
