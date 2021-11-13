@@ -1,12 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Entities.Accounts;
+using WebApi.Entities.Site;
 
 namespace WebApi.Helpers
 {
     public class DataContext : DbContext
     {
         public DbSet<Account> Accounts { get; set; }
-        
+        public DbSet<Site> Sites { get; set; }
+
         public DataContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,6 +37,16 @@ namespace WebApi.Helpers
             modelBuilder.Entity<RefreshToken>(x => 
             {
                 x.ToTable("RefreshTokens").HasKey(k => k.Id);
+            });
+
+            modelBuilder.Entity<Site>(x =>
+            {
+                x.ToTable("Sites").HasKey(k => k.Id);
+                x.OwnsOne(p => p.Address, p =>
+                {
+                    p.Property(pp => pp.FirstLine).HasColumnName("AddressFirstLine");
+                    p.Property(pp => pp.SecondLine).HasColumnName("AddressSecondLine");
+                });
             });
 
             base.OnModelCreating(modelBuilder);

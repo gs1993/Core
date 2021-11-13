@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.Helpers;
 
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211112220653_Add_Sites_Table")]
+    partial class Add_Sites_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,12 +206,14 @@ namespace WebApi.Migrations
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                             b1.Property<string>("FirstLine")
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasColumnType("nvarchar(max)")
                                 .HasColumnName("AddressFirstLine");
 
                             b1.Property<string>("SecondLine")
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasColumnType("nvarchar(max)")
-                                .HasColumnName("AddressSecondLine");
+                                .HasColumnName("AddressFirstLine");
 
                             b1.HasKey("SiteId");
 

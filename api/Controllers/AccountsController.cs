@@ -8,8 +8,6 @@ using WebApi.Services;
 
 namespace WebApi.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
     public class AccountsController : BaseController
     {
         private readonly IAccountService _accountService;

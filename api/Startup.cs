@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,10 +21,12 @@ namespace WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = Configuration.GetConnectionString("WebApiDatabase");
             services.AddDbContext<DataContext>(options => options
-                .UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"))
+                .UseSqlServer(connectionString)
                 .UseLazyLoadingProxies()
             );
+            services.AddSingleton(new QueriesConnectionString { Value = connectionString });
 
             services.AddCors();
             services.AddControllers().AddJsonOptions(x => {
@@ -36,6 +39,8 @@ namespace WebApi
 
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IEmailService, EmailService>();
+
+            services.AddMediatR(typeof(Startup).Assembly);
         }
 
         public void Configure(IApplicationBuilder app)
