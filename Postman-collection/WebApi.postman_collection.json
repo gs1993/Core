@@ -1,0 +1,188 @@
+{
+	"info": {
+		"_postman_id": "d3e2eb8c-8359-45f9-a8aa-58d793621a35",
+		"name": "WebApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Mr\",\r\n    \"firstName\": \"Grzegorz\",\r\n    \"lastName\": \"Sawiński\",\r\n    \"email\": \"grzegorz.sawinski93@gmail.com\",\r\n    \"password\": \"Test123\",\r\n    \"confirmPassword\": \"Test123\",\r\n    \"acceptTerms\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{url}}/accounts/register",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"accounts",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "verify-email",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"token\": \"D55F65C066387B9482D8CA491E833BE03CA1159A07DDB90CB7B7879C05A01DCFBB4C1ABB88296927\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/accounts/verify-email",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"accounts",
+						"verify-email"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "authenticate",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"grzegorz.sawinski93@gmail.com\",\r\n    \"password\": \"Test123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/accounts/authenticate",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"accounts",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "accounts",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzU2OTUxODQsImV4cCI6MTYzNTY5NjA4NCwiaWF0IjoxNjM1Njk1MTg0fQ.EF6nXS93WZiMnPyJQzyDZo1c8BlmUcVKo83kwtooRGs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5001/accounts",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change-role",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		},
+		{
+			"name": "refresh-token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		},
+		{
+			"name": "AddSite",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"site 1\",\r\n  \"addressFirstLine\": \"Marszałkowska 1/124\",\r\n  \"addressSecondLine\": \"00-223 Warszawa\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{url}}/site/add",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"site",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSite",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{url}}/site",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"site"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
