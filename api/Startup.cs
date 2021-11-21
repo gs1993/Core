@@ -39,6 +39,8 @@ namespace WebApi
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IEmailService, EmailService>();
 
+            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
             ConfigurePaymentGateway(services);
 
             services.AddMediatR(typeof(Startup).Assembly);

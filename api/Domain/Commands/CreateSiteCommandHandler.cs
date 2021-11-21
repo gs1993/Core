@@ -21,21 +21,23 @@ namespace WebApi.Domain.Commands
     public class CreateSiteCommandHandler : IRequestHandler<CreateSiteCommand, Result>
     {
         private readonly DataContext _context;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public CreateSiteCommandHandler(DataContext context)
+        public CreateSiteCommandHandler(DataContext context, IDateTimeProvider dateTimeProvider)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
         public async Task<Result> Handle(CreateSiteCommand request, CancellationToken cancellationToken)
         {
             var createSiteAddressResult = Address.Create(request.AddressFirstLine, request.AddressSecondLine);
             if (createSiteAddressResult.IsFailure)
-                return Result.Failure(createSiteAddressResult.Error);
+                return createSiteAddressResult;
 
-            var createSiteResult = Site.Create(request.Name, createSiteAddressResult.Value);
+            var createSiteResult = Site.Create(request.Name, createSiteAddressResult.Value, _dateTimeProvider.Now);
             if (createSiteResult.IsFailure)
-                return Result.Failure(createSiteResult.Error);
+                return createSiteResult;
             var newSite = createSiteResult.Value;
 
             var siteWithThatNameAlreadyExists = await _context.Sites
@@ -43,8 +45,8 @@ namespace WebApi.Domain.Commands
             if (siteWithThatNameAlreadyExists)
                 return Result.Failure("Site with that name already exists");
 
-            await _context.Sites.AddAsync(newSite, cancellationToken);
-            await _context.SaveChangesAsync();
+            _context.Sites.Attach(newSite);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

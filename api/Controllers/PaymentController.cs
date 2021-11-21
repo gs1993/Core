@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    public class PaymentController : BaseController
+    public class PaymentController : BaseLogicController
     {
-        private readonly IMediator _mediator;
-
-        public PaymentController(IMediator mediator)
-        {
-            _mediator = mediator;
+        public PaymentController(IMediator mediator) : base(mediator) 
+        { 
         }
+
 
         //[HttpPost("sale")]
         //[Authorize]

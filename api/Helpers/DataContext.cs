@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Entities.Accounts;
+using WebApi.Entities.Product;
 using WebApi.Entities.Site;
 
 namespace WebApi.Helpers
@@ -8,6 +9,7 @@ namespace WebApi.Helpers
     {
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Site> Sites { get; set; }
+        public DbSet<Product> Products { get; set; }
 
         public DataContext(DbContextOptions options) : base(options) { }
 
@@ -46,6 +48,17 @@ namespace WebApi.Helpers
                 {
                     p.Property(pp => pp.FirstLine).HasColumnName("AddressFirstLine");
                     p.Property(pp => pp.SecondLine).HasColumnName("AddressSecondLine");
+                });
+            });
+
+            modelBuilder.Entity<Product>(x =>
+            {
+                x.ToTable("Products").HasKey(k => k.Id);
+                x.HasIndex(p => p.Name).IsUnique();
+                x.OwnsOne(p => p.Price, p =>
+                {
+                    p.Property(pp => pp.Value).HasColumnName("Price");
+                    p.Property(pp => pp.Currency).HasColumnName("Currency");
                 });
             });
 

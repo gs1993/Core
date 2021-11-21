@@ -13,13 +13,10 @@ using WebApi.Dto.Site;
 
 namespace WebApi.Controllers
 {
-    public class SiteController : BaseController
+    public class SiteController : BaseLogicController
     {
-        private readonly IMediator _mediator;
-
-        public SiteController(IMediator mediator)
+        public SiteController(IMediator mediator) : base(mediator)
         {
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
 
@@ -29,7 +26,8 @@ namespace WebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
         public async Task<ActionResult<IReadOnlyList<SiteDto>>> Get(CancellationToken cancellationToken)
         {
-            return Ok(await _mediator.Send(new GetSiteListQuery { Name = string.Empty }, cancellationToken));
+            var sites = await _mediator.Send(new GetSiteListQuery { Name = string.Empty }, cancellationToken);
+            return Ok(sites);
         }
 
         [HttpPost("add")]
@@ -46,9 +44,7 @@ namespace WebApi.Controllers
                 AddressSecondLine = dto.AddressSecondLine
             }, cancellationToken);
 
-            return addSiteResult.IsFailure
-                ? BadRequest(addSiteResult.Error)
-                : Ok();
+            return FromResult(addSiteResult);
         }
     }
 }

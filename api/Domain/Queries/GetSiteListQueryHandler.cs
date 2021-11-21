@@ -27,9 +27,9 @@ namespace WebApi.Domain.Queries
 
         public async Task<IReadOnlyList<SiteDto>> Handle(GetSiteListQuery request, CancellationToken cancellationToken)
         {
-            string query = $"SELECT Id, Name, AddressFirstLine, AddressSecondLine FROM Sites";
+            string query = $"SELECT Id, Name, AddressFirstLine, AddressSecondLine FROM Sites WHERE IsDeleted = 0";
             using var connection = new SqlConnection(_connectionString.Value);
-            var result = await connection.QueryAsync<SiteDto>(query);
+            var result = await connection.QueryAsync<SiteDto>(query, cancellationToken);
             return result.ToList();
         }
     }
