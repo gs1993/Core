@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Options;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;

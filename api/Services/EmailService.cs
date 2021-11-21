@@ -3,7 +3,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using WebApi.Helpers;
+using Shared.Options;
 
 namespace WebApi.Services
 {

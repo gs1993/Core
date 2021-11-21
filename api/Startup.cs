@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PayuGateway;
+using Shared.Options;
+using System;
 using System.Text.Json.Serialization;
 using WebApi.Helpers;
 using WebApi.Middleware;
@@ -21,15 +24,11 @@ namespace WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = Configuration.GetConnectionString("WebApiDatabase");
-            services.AddDbContext<DataContext>(options => options
-                .UseSqlServer(connectionString)
-                .UseLazyLoadingProxies()
-            );
-            services.AddSingleton(new QueriesConnectionString { Value = connectionString });
+            AddDbContext(services);
 
             services.AddCors();
-            services.AddControllers().AddJsonOptions(x => {
+            services.AddControllers().AddJsonOptions(x =>
+            {
                 x.JsonSerializerOptions.IgnoreNullValues = true;
                 x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
@@ -39,6 +38,8 @@ namespace WebApi
 
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IEmailService, EmailService>();
+
+            ConfigurePaymentGateway(services);
 
             services.AddMediatR(typeof(Startup).Assembly);
         }
@@ -61,6 +62,23 @@ namespace WebApi
             app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(x => x.MapControllers());
+        }
+
+
+        private void AddDbContext(IServiceCollection services)
+        {
+            string connectionString = Configuration.GetConnectionString("WebApiDatabase");
+            services.AddDbContext<DataContext>(options => options
+                .UseSqlServer(connectionString)
+                .UseLazyLoadingProxies()
+            );
+            services.AddSingleton(new QueriesConnectionString { Value = connectionString });
+        }
+
+        private void ConfigurePaymentGateway(IServiceCollection services)
+        {
+            services.AddPayuGateway(Configuration.GetOptions<PayuGatewaySettings>());
+            //TODO: Add configurable gateway options
         }
     }
 }

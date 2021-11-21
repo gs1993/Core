@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31729.503
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "api\WebApi.csproj", "{CB1530E2-43BB-4758-8FC1-573A3EB92C2C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{D86BCFB2-96E3-421F-BE9A-210F961455EC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{9AE2CE5C-EF16-48C3-90F0-70A78F6F0EAA}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ApiDatabase", "ApiDatabase\ApiDatabase.sqlproj", "{3A40702D-2372-4EC1-8D53-4FC97E88D6D4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PaymentGateways", "PaymentGateways", "{E4EA7740-096D-4A01-A9D8-D2BBB64BE45F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BraintreeGateway", "BraintreeGateway\BraintreeGateway.csproj", "{44DBDB14-0C42-41F3-8D14-CA2222A42398}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayuGateway", "PayuGateway\PayuGateway.csproj", "{383EDC86-A204-4F9D-B8B1-B45FAA67A5F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,18 +23,25 @@ Global
 		{CB1530E2-43BB-4758-8FC1-573A3EB92C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB1530E2-43BB-4758-8FC1-573A3EB92C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB1530E2-43BB-4758-8FC1-573A3EB92C2C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A40702D-2372-4EC1-8D53-4FC97E88D6D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A40702D-2372-4EC1-8D53-4FC97E88D6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A40702D-2372-4EC1-8D53-4FC97E88D6D4}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{3A40702D-2372-4EC1-8D53-4FC97E88D6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A40702D-2372-4EC1-8D53-4FC97E88D6D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A40702D-2372-4EC1-8D53-4FC97E88D6D4}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9AE2CE5C-EF16-48C3-90F0-70A78F6F0EAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AE2CE5C-EF16-48C3-90F0-70A78F6F0EAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AE2CE5C-EF16-48C3-90F0-70A78F6F0EAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AE2CE5C-EF16-48C3-90F0-70A78F6F0EAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44DBDB14-0C42-41F3-8D14-CA2222A42398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44DBDB14-0C42-41F3-8D14-CA2222A42398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44DBDB14-0C42-41F3-8D14-CA2222A42398}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44DBDB14-0C42-41F3-8D14-CA2222A42398}.Release|Any CPU.Build.0 = Release|Any CPU
+		{383EDC86-A204-4F9D-B8B1-B45FAA67A5F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{383EDC86-A204-4F9D-B8B1-B45FAA67A5F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{383EDC86-A204-4F9D-B8B1-B45FAA67A5F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{383EDC86-A204-4F9D-B8B1-B45FAA67A5F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{3A40702D-2372-4EC1-8D53-4FC97E88D6D4} = {D86BCFB2-96E3-421F-BE9A-210F961455EC}
+		{44DBDB14-0C42-41F3-8D14-CA2222A42398} = {E4EA7740-096D-4A01-A9D8-D2BBB64BE45F}
+		{383EDC86-A204-4F9D-B8B1-B45FAA67A5F1} = {E4EA7740-096D-4A01-A9D8-D2BBB64BE45F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A13A582A-4EF0-4D09-94BE-171177AA9A9B}
