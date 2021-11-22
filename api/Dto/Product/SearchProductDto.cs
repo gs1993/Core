@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Dto.Product
 {
-    public record ProductSearchDto
+    public record SearchProductDto
     {
         public string Name { get; init; }
         public int? MinQuantity { get; init; }

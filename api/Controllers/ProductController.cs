@@ -23,7 +23,7 @@ namespace WebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, type: typeof(IReadOnlyList<ProductDto>))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
-        public async Task<ActionResult<IReadOnlyList<ProductDto>>> Get(ProductSearchDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<IReadOnlyList<ProductDto>>> Get(SearchProductDto dto, CancellationToken cancellationToken)
         {
             var products = await _mediator.Send(new GetProductListQuery
             {

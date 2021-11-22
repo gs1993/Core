@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using System;
 
-namespace WebApi.Entities
+namespace WebApi.Entities.Shared
 {
     public abstract class BaseEntity : Entity
     {
@@ -18,7 +18,7 @@ namespace WebApi.Entities
 
         public void Delete(DateTime deleteDate)
         {
-            if (IsDeleted) 
+            if (IsDeleted)
                 return;
             IsDeleted = true;
             DeleteDate = deleteDate;

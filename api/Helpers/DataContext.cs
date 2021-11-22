@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Entities.Accounts;
 using WebApi.Entities.Product;
+using WebApi.Entities.Shared;
 using WebApi.Entities.Site;
 
 namespace WebApi.Helpers
@@ -10,6 +11,7 @@ namespace WebApi.Helpers
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Site> Sites { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         public DataContext(DbContextOptions options) : base(options) { }
 

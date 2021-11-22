@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace WebApi.Entities.Accounts
+namespace WebApi.Entities.Shared
 {
     public class Email : ValueObject
     {

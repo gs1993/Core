@@ -12,6 +12,7 @@ using WebApi.Helpers;
 using WebApi.Dto.Accounts;
 using WebApi.Entities.Accounts;
 using Shared.Options;
+using WebApi.Entities.Shared;
 
 namespace WebApi.Services
 {

@@ -32,6 +32,9 @@ namespace WebApi.Domain.Commands
 
         public async Task<Result> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             var currencyResult = Price.Create(request.Price, request.Currency);
             if (currencyResult.IsFailure)
                 return currencyResult;

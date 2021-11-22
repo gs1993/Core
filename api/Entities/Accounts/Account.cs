@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WebApi.Entities.Shared;
 
 namespace WebApi.Entities.Accounts
 {

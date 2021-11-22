@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using System.Collections.Generic;
 
-namespace WebApi.Entities.Accounts
+namespace WebApi.Entities.Shared
 {
     public class Name : ValueObject
     {
@@ -20,9 +20,15 @@ namespace WebApi.Entities.Accounts
         public static Result<Name> Create(string title, string firstName, string lastName)
         {
             if (string.IsNullOrWhiteSpace(lastName))
-                return Result.Failure<Name>("'LastName' cannot be empty.");
+                return Result.Failure<Name>("Last name cannot be empty");
+            if(lastName.Length > 50)
+                return Result.Failure<Name>("Last name too long");
             if (string.IsNullOrWhiteSpace(firstName))
-                return Result.Failure<Name>("'FirstName' cannot be empty.");
+                return Result.Failure<Name>("First name cannot be empty");
+            if (lastName.Length > 50)
+                return Result.Failure<Name>("First name too long");
+            if (title?.Length > 5)
+                return Result.Failure<Name>("Title too long");
 
             string nameTitle = string.IsNullOrWhiteSpace(title) ? string.Empty : title;
             return Result.Success(new Name(nameTitle, firstName, lastName));

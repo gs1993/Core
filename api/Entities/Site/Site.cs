@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using System;
+using WebApi.Entities.Shared;
 
 namespace WebApi.Entities.Site
 {
