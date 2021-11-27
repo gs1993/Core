@@ -33,8 +33,13 @@ namespace WebApi.Domain.Queries
         public async Task<IReadOnlyList<OrderDto>> Handle(GetOrderListQuery request, CancellationToken cancellationToken)
         {
             var builder = new SqlBuilder();
-            var selector = builder.AddTemplate("SELECT  FROM Orders /**where**/");
-            builder.Where("IsDeleted = 0");
+            var selector = builder.AddTemplate(@"
+    SELECT o.Id, o.Email, o.PhoneNumber, o.CountryCallingCode as PhoneNumberCountryOrderCode, o.FirstName, o.LastName,
+        p.[Name], oi.Quantity, p.Price, p.Currency
+    FROM Orders o
+    JOIN OrderItems oi ON o.Id = oi.OrderId
+    JOIN Products p ON oi.ProductId = p.Id /**where**/");
+            builder.Where("o.IsDeleted = 0");
 
             if (!string.IsNullOrWhiteSpace(request.Email))
                 builder.Where("Email = @Email", new { request.Email });
@@ -55,7 +60,20 @@ namespace WebApi.Domain.Queries
             //    builder.Where("OrderItems <= @MaxOrderItems", new { request.MaxOrderItems });
 
             using var connection = new SqlConnection(_connectionString.Value);
-            var result = await connection.QueryAsync<OrderDto>(selector.RawSql, cancellationToken);
+            var orderDictionary = new Dictionary<long, OrderDto>();
+            var result = connection.Query<OrderDto, OrderListItemDto, OrderDto>(selector.RawSql,
+                (order, orderDetail) =>
+                {
+                    if (!orderDictionary.TryGetValue(order.Id, out OrderDto orderEntry))
+                    {
+                        orderEntry = order;
+                        orderEntry.OrderItems = new List<OrderListItemDto>();
+                        orderDictionary.Add(orderEntry.Id, orderEntry);
+                    }
+
+                    orderEntry.OrderItems.Add(orderDetail);
+                    return orderEntry;
+                }, splitOn: "o.Id");
             return result.ToList();
         }
     }

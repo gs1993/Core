@@ -25,7 +25,7 @@ namespace WebApi.Entities.Shared
                 return Result.Failure<Name>("Last name too long");
             if (string.IsNullOrWhiteSpace(firstName))
                 return Result.Failure<Name>("First name cannot be empty");
-            if (lastName.Length > 50)
+            if (firstName.Length > 50)
                 return Result.Failure<Name>("First name too long");
             if (title?.Length > 5)
                 return Result.Failure<Name>("Title too long");

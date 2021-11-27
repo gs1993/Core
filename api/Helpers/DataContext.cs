@@ -20,6 +20,7 @@ namespace WebApi.Helpers
             modelBuilder.Entity<Account>(x => 
             {
                 x.ToTable("Accounts").HasKey(k => k.Id);
+                x.HasQueryFilter(x => !x.IsDeleted);
                 x.HasMany(p => p.RefreshTokens)
                     .WithOne()
                     .OnDelete(DeleteBehavior.Cascade);
@@ -46,6 +47,7 @@ namespace WebApi.Helpers
             modelBuilder.Entity<Site>(x =>
             {
                 x.ToTable("Sites").HasKey(k => k.Id);
+                x.HasQueryFilter(x => !x.IsDeleted);
                 x.OwnsOne(p => p.Address, p =>
                 {
                     p.Property(pp => pp.FirstLine).HasColumnName("AddressFirstLine");
@@ -56,12 +58,41 @@ namespace WebApi.Helpers
             modelBuilder.Entity<Product>(x =>
             {
                 x.ToTable("Products").HasKey(k => k.Id);
+                x.HasQueryFilter(x => !x.IsDeleted);
                 x.HasIndex(p => p.Name).IsUnique();
                 x.OwnsOne(p => p.Price, p =>
                 {
                     p.Property(pp => pp.Value).HasColumnName("Price");
                     p.Property(pp => pp.Currency).HasColumnName("Currency");
                 });
+            });
+
+            modelBuilder.Entity<Order>(x =>
+            {
+                x.ToTable("Orders").HasKey(k => k.Id);
+                x.HasQueryFilter(x => !x.IsDeleted);
+                x.OwnsOne(p => p.Name, p =>
+                {
+                    p.Property(pp => pp.FirstName).HasColumnName(nameof(Name.FirstName));
+                    p.Property(pp => pp.LastName).HasColumnName(nameof(Name.LastName));
+                });
+                x.OwnsOne(p => p.PhoneNumber, p =>
+                {
+                    p.Property(pp => pp.Value).HasColumnName("PhoneNumber");
+                    p.Property(pp => pp.CountryCallingCode).HasColumnName(nameof(PhoneNumber.CountryCallingCode));
+                });
+                x.Property(p => p.Email)
+                    .HasConversion(p => p.Value, p => Email.Create(p).Value);
+            });
+
+            modelBuilder.Entity<OrderItem>(x =>
+            {
+                x.ToTable("OrderItems").HasKey(k => k.Id);
+                x.HasQueryFilter(x => !x.IsDeleted);
+                x.HasOne(x => x.Product).WithMany();
+                x.HasOne(x => x.Order)
+                    .WithMany(x => x.OrderItems)
+                    .Metadata.PrincipalToDependent.SetPropertyAccessMode(PropertyAccessMode.Field);
             });
 
             base.OnModelCreating(modelBuilder);

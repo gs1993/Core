@@ -15,14 +15,14 @@ namespace WebApi.Controllers
         }
 
 
-        public IActionResult FromResult(Result result)
+        protected IActionResult FromResult(Result result)
         {
             return result.IsFailure
                 ? BadRequest(result.Error)
                 : Ok();
         }
 
-        public IActionResult FromResult<T>(Result<T> result)
+        protected IActionResult FromResult<T>(Result<T> result)
         {
             return result.IsFailure
                 ? BadRequest(result.Error)

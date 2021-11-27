@@ -10,6 +10,6 @@ namespace WebApi.Dto.Order
         public string PhoneNumberCountryOrderCode { get; }
         public string FirstName { get; }
         public string LastName { get; }
-        public IEnumerable<OrderItemDto> OrderItems { get; }
+        public List<OrderListItemDto> OrderItems { get; set; }
     }
 }

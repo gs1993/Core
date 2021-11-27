@@ -2,7 +2,7 @@
 {
     public record OrderItemDto
     {
-        public long ProductId { get; }
-        public int Quantity { get; }
+        public long ProductId { get; init; }
+        public int Quantity { get; init; }
     }
 }

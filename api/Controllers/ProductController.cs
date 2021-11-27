@@ -40,7 +40,7 @@ namespace WebApi.Controllers
 
         [HttpPost("create")]
         [Authorize(Role.Admin)]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Product created successfully")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Product created successfully", type: typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
         public async Task<IActionResult> Create(CreateProductDto dto, CancellationToken cancellationToken)

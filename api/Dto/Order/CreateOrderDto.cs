@@ -4,11 +4,11 @@ namespace WebApi.Dto.Order
 {
     public record CreateOrderDto
     {
-        public string Email { get; }
-        public string PhoneNumber { get; }
-        public string PhoneNumberCountryOrderCode { get; }
-        public string FirstName { get; }
-        public string LastName { get; }
-        public IEnumerable<OrderItemDto> OrderItems { get; }
+        public string Email { get; init; }
+        public string PhoneNumber { get; init; }
+        public string PhoneNumberCountryOrderCode { get; init; }
+        public string FirstName { get; init; }
+        public string LastName { get; init; }
+        public IEnumerable<OrderItemDto> OrderItems { get; init; }
     }
 }

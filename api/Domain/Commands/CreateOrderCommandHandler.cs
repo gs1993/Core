@@ -56,11 +56,8 @@ namespace WebApi.Domain.Commands
             if (phoneNumberResult.IsFailure)
                 return phoneNumberResult;
 
-            var buyerDataResult = BuyerData.Create(emailResult.Value, nameResult.Value, phoneNumberResult.Value);
-            if (buyerDataResult.IsFailure)
-                return buyerDataResult;
-
-            var orderResult = Order.Create(buyerDataResult.Value);
+            var orderCreateDate = _dateTimeProvider.Now;
+            var orderResult = Order.Create(emailResult.Value, phoneNumberResult.Value, nameResult.Value, orderCreateDate);
             if (orderResult.IsFailure)
                 return orderResult;
 
@@ -69,7 +66,7 @@ namespace WebApi.Domain.Commands
             foreach (var orderItem in request.OrderItems)
             {
                 var product = products.FirstOrDefault(x => x.Id == orderItem.ProductId);
-                var addOrderItemResult = order.AddOrderItem(product, orderItem.Quantity);
+                var addOrderItemResult = order.AddOrderItem(product, orderItem.Quantity, orderCreateDate);
                 if (addOrderItemResult.IsFailure)
                     return addOrderItemResult;
             }
@@ -82,7 +79,8 @@ namespace WebApi.Domain.Commands
 
         private async Task<List<Product>> GetOrderedProducts(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            var productIds = request.OrderItems.Select(y => y.ProductId);
+            var productIds = request.OrderItems
+                .Select(x => x.ProductId);
 
             return await _context.Products
                 .Where(x => productIds.Contains(x.Id))
