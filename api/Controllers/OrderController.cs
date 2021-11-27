@@ -22,12 +22,12 @@ namespace WebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, type: typeof(IReadOnlyList<OrderDto>))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
-        public async Task<ActionResult<IReadOnlyList<OrderDto>>> Get(SearchOrderDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<IReadOnlyList<OrderDto>>> Get([FromBody]SearchOrderDto dto, CancellationToken cancellationToken)
         {
             var products = await _mediator.Send(new GetOrderListQuery
             {
                 Email = dto.Email,
-                ProductId = dto.ProductId,
+                ProductName = dto.ProductName,
                 MaxOrderItems = dto.MaxOrderItems,
                 MinOrderItems = dto.MinOrderItems,
                 MaxOrderValue = dto.MaxOrderValue,
@@ -38,8 +38,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Order created successfully")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Order created successfully", type: typeof(long))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
         public async Task<IActionResult> Create(CreateOrderDto dto, CancellationToken cancellationToken)
@@ -49,7 +48,7 @@ namespace WebApi.Controllers
                 ProductId = x.ProductId,
                 Quantity = x.Quantity
             });
-            var createProductResult = await _mediator.Send(new CreateOrderCommand
+            var createOrdertResult = await _mediator.Send(new CreateOrderCommand
             {
                 Email = dto.Email,
                 FirstName = dto.FirstName,
@@ -59,7 +58,23 @@ namespace WebApi.Controllers
                 OrderItems = orderItems
             }, cancellationToken);
 
-            return FromResult(createProductResult);
+            return FromResult(createOrdertResult);
+        }
+
+        [HttpPost("AddOrderItem/{orderId}")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Order item added successfully")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
+        public async Task<IActionResult> AddOrderItem(long orderId, CreateOrderItemDto dto, CancellationToken cancellationToken)
+        {
+            var addOrderItemResult = await _mediator.Send(new AddOrderItemCommand
+            {
+                OrderId = orderId,
+                ProductId = dto.ProductId,
+                Quantity = dto.Quantity
+            }, cancellationToken);
+
+            return FromResult(addOrderItemResult);
         }
     }
 }

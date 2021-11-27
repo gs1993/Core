@@ -38,5 +38,10 @@ namespace WebApi.Entities.Shared
         {
             return email.Value;
         }
+
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }

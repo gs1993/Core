@@ -75,6 +75,7 @@ namespace WebApi
                 .UseLazyLoadingProxies()
             );
             services.AddSingleton(new QueriesConnectionString { Value = connectionString });
+            services.AddTransient<IReadonlyDataContext, ReadonlyDataContext>();
         }
 
         private void ConfigurePaymentGateway(IServiceCollection services)

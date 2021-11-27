@@ -38,7 +38,25 @@ namespace WebApi.Entities.Product
             return Result.Success(new Product(name, description, quantity, price, createDate));
         }
 
-        
 
+        public Result IncreaseQuantity(int quantityToIncrease)
+        {
+            if (quantityToIncrease < 0)
+                throw new ArgumentOutOfRangeException(nameof(quantityToIncrease));
+
+            Quantity += quantityToIncrease;
+            return Result.Success();
+        }
+
+        public Result DecreaseQuantity(int quantityToDecrease)
+        {
+            if(quantityToDecrease < 0)
+                throw new ArgumentOutOfRangeException(nameof(quantityToDecrease));
+            if (quantityToDecrease > Quantity)
+                return Result.Failure("Not enougth product quantity");
+
+            Quantity -= quantityToDecrease;
+            return Result.Success();
+        }
     }
 }

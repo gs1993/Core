@@ -32,7 +32,7 @@ namespace WebApi.Controllers
 
         [HttpPost("add")]
         [Authorize]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Site added successfully", type: typeof(string))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Site added successfully")]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
         public async Task<IActionResult> Add(AddSiteDto dto, CancellationToken cancellationToken)

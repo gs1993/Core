@@ -2,11 +2,11 @@
 {
     public record SearchOrderDto
     {
-        public string Email { get; }
-        public decimal? MinOrderValue { get; }
-        public decimal? MaxOrderValue { get; }
-        public long? ProductId { get; }
-        public int? MinOrderItems { get; }
-        public int? MaxOrderItems { get; }
+        public string Email { get; init; }
+        public string ProductName { get; init; }
+        public decimal? MinOrderValue { get; init; }
+        public decimal? MaxOrderValue { get; init; }
+        public int? MinOrderItems { get; init; }
+        public int? MaxOrderItems { get; init; }
     }
 }

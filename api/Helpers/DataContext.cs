@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WebApi.Entities.Accounts;
 using WebApi.Entities.Product;
 using WebApi.Entities.Shared;
@@ -71,6 +72,11 @@ namespace WebApi.Helpers
             {
                 x.ToTable("Orders").HasKey(k => k.Id);
                 x.HasQueryFilter(x => !x.IsDeleted);
+
+                x.HasMany(x => x.OrderItems)
+                    .WithOne(x => x.Order);
+                x.Metadata.FindNavigation(nameof(Order.OrderItems)).SetPropertyAccessMode(PropertyAccessMode.Field);
+
                 x.OwnsOne(p => p.Name, p =>
                 {
                     p.Property(pp => pp.FirstName).HasColumnName(nameof(Name.FirstName));
@@ -83,6 +89,11 @@ namespace WebApi.Helpers
                 });
                 x.Property(p => p.Email)
                     .HasConversion(p => p.Value, p => Email.Create(p).Value);
+                x.OwnsOne(p => p.FullPrice, p =>
+                {
+                    p.Property(pp => pp.Value).HasColumnName("Price");
+                    p.Property(pp => pp.Currency).HasColumnName("Currency");
+                });
             });
 
             modelBuilder.Entity<OrderItem>(x =>
@@ -90,12 +101,27 @@ namespace WebApi.Helpers
                 x.ToTable("OrderItems").HasKey(k => k.Id);
                 x.HasQueryFilter(x => !x.IsDeleted);
                 x.HasOne(x => x.Product).WithMany();
-                x.HasOne(x => x.Order)
-                    .WithMany(x => x.OrderItems)
-                    .Metadata.PrincipalToDependent.SetPropertyAccessMode(PropertyAccessMode.Field);
             });
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddFilter((category, level) =>
+                        category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information)
+                    .AddConsole();
+            });
+
+            //if (_useConsoleLogger)
+            //{
+                optionsBuilder
+                    .UseLoggerFactory(loggerFactory)
+                    .EnableSensitiveDataLogging();
+            //}
         }
     }
 }

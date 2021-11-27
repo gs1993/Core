@@ -1,10 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
+using System;
 using System.Collections.Generic;
 
 namespace WebApi.Entities.Product
 {
     public class Price : ValueObject
     {
+        public static Price Empty = new(0, string.Empty);
+
         public decimal Value { get; }
         public string Currency { get; }
 
@@ -37,6 +40,53 @@ namespace WebApi.Entities.Product
         {
             yield return Value;
             yield return Currency;
+        }
+
+        public static Price operator +(Price a, Price b)
+        {
+            if (a == null)
+                throw new ArgumentNullException(nameof(a));
+            if (b == null)
+                throw new ArgumentNullException(nameof(b));
+            if (a == Empty)
+                return b;
+            if (b == Empty)
+                return a;
+
+            if (a.Currency != b.Currency)
+                throw new ArgumentException($"Cannot add different currencies");
+
+            return new Price(a.Value + b.Value, a.Currency);
+        }
+
+        public static Price operator -(Price a, Price b)
+        {
+            if (a == null)
+                throw new ArgumentNullException(nameof(a));
+            if (b == null)
+                throw new ArgumentNullException(nameof(b));
+            if (a == Empty)
+                throw new ArgumentException("Invalid value");
+            if (b == Empty)
+                return a;
+
+            if (a.Currency != b.Currency)
+                throw new ArgumentException("Cannot subtract different currencies");
+            decimal newValue = a.Value - b.Value;
+            if (newValue < 0)
+                throw new ArgumentException("Invalid value");
+
+            return new Price(a.Value - b.Value, a.Currency);
+        }
+
+        public static Price operator *(Price a, int b)
+        {
+            if (a == null)
+                throw new ArgumentNullException(nameof(a));
+            if (b <= 0)
+                throw new ArgumentNullException(nameof(b));
+
+            return new Price(a.Value * b, a.Currency);
         }
     }
 }

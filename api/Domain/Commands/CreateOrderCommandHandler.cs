@@ -12,7 +12,7 @@ using WebApi.Helpers;
 
 namespace WebApi.Domain.Commands
 {
-    public record CreateOrderCommand : IRequest<Result>
+    public record CreateOrderCommand : IRequest<Result<long>>
     {
         public string Email { get; init; }
         public string PhoneNumber { get; init; }
@@ -28,7 +28,7 @@ namespace WebApi.Domain.Commands
         }
     }
 
-    public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result>
+    public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<long>>
     {
         private readonly DataContext _context;
         private readonly IDateTimeProvider _dateTimeProvider;
@@ -39,27 +39,27 @@ namespace WebApi.Domain.Commands
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
-        public async Task<Result> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+        public async Task<Result<long>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
             var emailResult = Email.Create(request.Email);
             if (emailResult.IsFailure)
-                return emailResult;
+                return Result.Failure<long>(emailResult.Error);
 
             var nameResult = Name.Create(string.Empty, request.FirstName, request.LastName);
             if (nameResult.IsFailure)
-                return nameResult;
+                return Result.Failure<long>(nameResult.Error);
 
             var phoneNumberResult = PhoneNumber.Create(request.PhoneNumber, request.PhoneNumberCountryOrderCode);
             if (phoneNumberResult.IsFailure)
-                return phoneNumberResult;
+                return Result.Failure<long>(phoneNumberResult.Error);
 
             var orderCreateDate = _dateTimeProvider.Now;
             var orderResult = Order.Create(emailResult.Value, phoneNumberResult.Value, nameResult.Value, orderCreateDate);
             if (orderResult.IsFailure)
-                return orderResult;
+                return Result.Failure<long>(orderResult.Error);
 
             var order = orderResult.Value;
             var products = await GetOrderedProducts(request, cancellationToken);
@@ -68,13 +68,13 @@ namespace WebApi.Domain.Commands
                 var product = products.FirstOrDefault(x => x.Id == orderItem.ProductId);
                 var addOrderItemResult = order.AddOrderItem(product, orderItem.Quantity, orderCreateDate);
                 if (addOrderItemResult.IsFailure)
-                    return addOrderItemResult;
+                    return Result.Failure<long>(addOrderItemResult.Error);
             }
 
             _context.Orders.Attach(order);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return Result.Success();
+            return Result.Success(order.Id);
         }
 
         private async Task<List<Product>> GetOrderedProducts(CreateOrderCommand request, CancellationToken cancellationToken)

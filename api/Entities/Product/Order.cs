@@ -12,8 +12,11 @@ namespace WebApi.Entities.Product
         public virtual Name Name { get; }
         public virtual PhoneNumber PhoneNumber { get; }
 
+        public Price FullPrice { get; private set; }
+        public int OrderItemsCount { get; private set; }
+
         private readonly List<OrderItem> _orderItems;
-        public virtual IReadOnlyList<OrderItem> OrderItems => _orderItems.ToList();
+        public virtual IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
 
         protected Order() { }
@@ -23,6 +26,8 @@ namespace WebApi.Entities.Product
             Name = name;
             PhoneNumber = phoneNumber;
             _orderItems = new List<OrderItem>();
+            FullPrice = Price.Empty;
+            OrderItemsCount = 0;
         }
 
         public static Result<Order> Create(Email email, PhoneNumber phoneNumber, Name name, DateTime createDate)
@@ -46,24 +51,40 @@ namespace WebApi.Entities.Product
                 return Result.Failure("Invalid product");
             if (quantity < 1)
                 return Result.Failure("Invalid product quantity");
+            if (quantity > product.Quantity)
+                return Result.Failure("Invalid product quantity");
 
-            _orderItems.Add(new OrderItem(product, this, quantity, createDate));
+            var decreaseProductQuantityResult = product.DecreaseQuantity(quantity);
+            if (decreaseProductQuantityResult.IsFailure)
+                return decreaseProductQuantityResult;
+
+            var existingOrderItem = _orderItems.FirstOrDefault(x => x.Product == product);
+            if (existingOrderItem == null)
+                _orderItems.Add(new OrderItem(product, this, quantity, createDate));
+            else
+                existingOrderItem.AddQuantity(quantity);
+
+            FullPrice += product.Price * quantity;
+            OrderItemsCount += quantity;
+
             return Result.Success();
         }
-    }
 
-    public class OrderItem : BaseEntity
-    {
-        public virtual Product Product { get; private set; }
-        public virtual Order Order { get; private set; }
-        public int Quantity {  get; set; }
-
-        protected OrderItem() { }
-        public OrderItem(Product product, Order order, int quantity, DateTime createDate) : base(createDate)
+        public Result RemoveOrderItem(OrderItem orderItem, int quantity, DateTime deleteDate)
         {
-            Product = product;
-            Order = order;
-            Quantity = quantity;
+            if (orderItem == null)
+                return Result.Failure("Invalid order item");
+            if (quantity < 1 || quantity > orderItem.Quantity)
+                return Result.Failure("Invalid quantity");
+
+            if (orderItem.Quantity == quantity)
+                orderItem.Delete(deleteDate);
+           
+            orderItem.Product.IncreaseQuantity(quantity);
+            FullPrice -= orderItem.Product.Price * quantity;
+            OrderItemsCount -= quantity;
+
+            return Result.Success();
         }
     }
 }
