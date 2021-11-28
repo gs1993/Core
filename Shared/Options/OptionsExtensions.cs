@@ -7,7 +7,7 @@ namespace Shared.Options
         public static TOptions GetOptions<TOptions>(this IConfiguration configuration, string sectionName = null)
             where TOptions : new()
         {
-            sectionName ??= nameof(TOptions);
+            sectionName ??= typeof(TOptions).Name;
 
             var options = new TOptions();
             configuration.GetSection(sectionName).Bind(options);

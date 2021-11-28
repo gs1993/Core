@@ -14,6 +14,7 @@ namespace WebApi.Entities.Product
 
         public Price FullPrice { get; private set; }
         public int OrderItemsCount { get; private set; }
+        public OrderState OrderState { get; private set; }
 
         private readonly List<OrderItem> _orderItems;
         public virtual IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
@@ -28,6 +29,7 @@ namespace WebApi.Entities.Product
             _orderItems = new List<OrderItem>();
             FullPrice = Price.Empty;
             OrderItemsCount = 0;
+            OrderState = OrderState.PaymentNew;
         }
 
         public static Result<Order> Create(Email email, PhoneNumber phoneNumber, Name name, DateTime createDate)
@@ -44,7 +46,7 @@ namespace WebApi.Entities.Product
             return Result.Success(new Order(email, phoneNumber, name, createDate));
         }
 
-
+        
         public Result AddOrderItem(Product product, int quantity, DateTime createDate)
         {
             if (product == null)
@@ -85,6 +87,21 @@ namespace WebApi.Entities.Product
             OrderItemsCount -= quantity;
 
             return Result.Success();
+        }
+
+        public void SetPaymentStarted(DateTime paymentStartDate)
+        {
+            OrderState = OrderState.PaymentStarted(OrderState, paymentStartDate);
+        }
+
+        public void SetPaymentInProgress(DateTime paymentInProgressDate)
+        {
+            OrderState = OrderState.PaymentInProgress(OrderState, paymentInProgressDate);
+        }
+
+        public void SetPaymentError(DateTime paymentErrorDate)
+        {
+            OrderState = OrderState.PaymentError(OrderState, paymentErrorDate);
         }
     }
 }

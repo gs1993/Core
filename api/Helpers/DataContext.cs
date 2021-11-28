@@ -94,6 +94,15 @@ namespace WebApi.Helpers
                     p.Property(pp => pp.Value).HasColumnName("Price");
                     p.Property(pp => pp.Currency).HasColumnName("Currency");
                 });
+                x.OwnsOne(p => p.OrderState, p =>
+                {
+                    p.Property(pp => pp.Value).HasColumnName("State");
+                    p.Property(pp => pp.PaymentStartDate).HasColumnName(nameof(OrderState.PaymentStartDate));
+                    p.Property(pp => pp.PaymentInProgressDate).HasColumnName(nameof(OrderState.PaymentInProgressDate));
+                    p.Property(pp => pp.PaymentSuccededDate).HasColumnName(nameof(OrderState.PaymentSuccededDate));
+                    p.Property(pp => pp.PaymentCanceledDate).HasColumnName(nameof(OrderState.PaymentCanceledDate));
+                    p.Property(pp => pp.PaymentErrorDate).HasColumnName(nameof(OrderState.PaymentErrorDate));
+                });
             });
 
             modelBuilder.Entity<OrderItem>(x =>

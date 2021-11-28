@@ -37,6 +37,7 @@ namespace WebApi
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
             services.AddScoped<IAccountService, AccountService>();
+            services.AddSingleton(Configuration.GetOptions<EmailSettings>());
             services.AddScoped<IEmailService, EmailService>();
 
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();

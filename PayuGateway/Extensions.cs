@@ -4,6 +4,9 @@ using Shared.Options;
 using System;
 using Refit;
 using Shared.PaymentMethods;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace PayuGateway
 {
@@ -13,9 +16,15 @@ namespace PayuGateway
         {
             services.AddSingleton(settings);
 
-            services
-                .AddRefitClient<IPayuApi>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri(settings.BaseAddress));
+            var handler = new HttpClientHandler()
+            {
+                AllowAutoRedirect = false
+            };
+            var iPayuApi = RestService.For<IPayuApi>(new HttpClient(handler)
+            {
+                BaseAddress = new Uri(settings.BaseAddress)
+            });
+            services.AddSingleton(iPayuApi);
 
             services.AddTransient<IPaymentGateway, PayuGatewayPaymentService>();
         }

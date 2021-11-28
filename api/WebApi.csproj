@@ -30,4 +30,7 @@
       <ProjectReference Include="..\PayuGateway\PayuGateway.csproj" />
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Dto\Payments\" />
+    </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using PayuGateway.ApiClient.Dto;
 using Refit;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PayuGateway.ApiClient
@@ -8,21 +9,9 @@ namespace PayuGateway.ApiClient
     public interface IPayuApi
     {
         [Post("/pl/standard/user/oauth/authorize")]
-        Task<ApiResponse<PayuAuthResponseDto>> Authorize([Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> data);
-    }
+        Task<ApiResponse<PayuAuthResponseDto>> Authorize([Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> data, CancellationToken cancellationToken);
 
-    public record PayuAuthResponseDto
-    {
-        [JsonProperty(PropertyName = "access_token")]
-        public string AccessToken { get; init; }
-
-        [JsonProperty(PropertyName = "token_type")]
-        public string TokenType { get; init; }
-
-        [JsonProperty(PropertyName = "expires_in")]
-        public int ExpirationPeriodInSeconds { get; init; }
-
-        [JsonProperty(PropertyName = "grant_type")]
-        public string GrantType { get; init; }
+        [Post("/api/v2_1/orders")]
+        Task<ApiResponse<CreateOrderResponseDto>> CreateOrder(CreateOrderDto dto, [Authorize("Bearer")] string token, CancellationToken cancellationToken);
     }
 }

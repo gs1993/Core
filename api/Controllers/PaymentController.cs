@@ -4,6 +4,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using WebApi.Domain.Commands;
 
 namespace WebApi.Controllers
 {
@@ -14,23 +15,18 @@ namespace WebApi.Controllers
         }
 
 
-        //[HttpPost("sale")]
-        //[Authorize]
-        //[SwaggerResponse((int)HttpStatusCode.OK, "Sale processed successfully")]
-        //[SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
-        //[SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
-        //public async Task<IActionResult> Add(, CancellationToken cancellationToken)
-        //{
-        //    var addSiteResult = await _mediator.Send(new CreateSiteCommand
-        //    {
-        //        Name = dto.Name,
-        //        AddressFirstLine = dto.AddressFirstLine,
-        //        AddressSecondLine = dto.AddressSecondLine
-        //    }, cancellationToken);
+        [HttpPost("initiatePayment/{orderId}")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Sale processed successfully")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
+        public async Task<IActionResult> Add(long orderId, CancellationToken cancellationToken)
+        {
+            var paymentResult = await _mediator.Send(new InitiatePaymentCommand
+            {
+                OrderId = orderId
+            }, cancellationToken);
 
-        //    return addSiteResult.IsFailure
-        //        ? BadRequest(addSiteResult.Error)
-        //        : Ok();
-        //}
+            return FromResult(paymentResult);
+        }
     }
 }
