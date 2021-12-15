@@ -21,12 +21,10 @@ namespace WebApi.Domain.Commands
     public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result>
     {
         private readonly DataContext _context;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public CreateProductCommandHandler(DataContext context, IDateTimeProvider dateTimeProvider)
+        public CreateProductCommandHandler(DataContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
 
@@ -39,8 +37,7 @@ namespace WebApi.Domain.Commands
             if (currencyResult.IsFailure)
                 return currencyResult;
 
-            var productResult = Product.Create(request.Name, request.Description, request.Quantity, 
-                currencyResult.Value, _dateTimeProvider.Now);
+            var productResult = Product.Create(request.Name, request.Description, request.Quantity, currencyResult.Value);
             if (productResult.IsFailure)
                 return productResult;
 

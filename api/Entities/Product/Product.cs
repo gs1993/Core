@@ -12,7 +12,7 @@ namespace WebApi.Entities.Product
         public Price Price { get; private set; }
 
         protected Product() { }
-        private Product(string name, string description, int quantity, Price price, DateTime createDate) : base(createDate)
+        private Product(string name, string description, int quantity, Price price)
         {
             Name = name;
             Description = description;
@@ -20,7 +20,7 @@ namespace WebApi.Entities.Product
             Price = price;
         }
 
-        public static Result<Product> Create(string name, string description, int quantity, Price price, DateTime createDate)
+        public static Result<Product> Create(string name, string description, int quantity, Price price)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return Result.Failure<Product>("Name cannot be empty");
@@ -35,7 +35,7 @@ namespace WebApi.Entities.Product
             if (price == null)
                 return Result.Failure<Product>("Invalid price");
 
-            return Result.Success(new Product(name, description, quantity, price, createDate));
+            return Result.Success(new Product(name, description, quantity, price));
         }
 
 

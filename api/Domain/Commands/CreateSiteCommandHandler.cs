@@ -21,12 +21,10 @@ namespace WebApi.Domain.Commands
     public class CreateSiteCommandHandler : IRequestHandler<CreateSiteCommand, Result>
     {
         private readonly DataContext _context;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public CreateSiteCommandHandler(DataContext context, IDateTimeProvider dateTimeProvider)
+        public CreateSiteCommandHandler(DataContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
         public async Task<Result> Handle(CreateSiteCommand request, CancellationToken cancellationToken)
@@ -35,7 +33,7 @@ namespace WebApi.Domain.Commands
             if (createSiteAddressResult.IsFailure)
                 return createSiteAddressResult;
 
-            var createSiteResult = Site.Create(request.Name, createSiteAddressResult.Value, _dateTimeProvider.Now);
+            var createSiteResult = Site.Create(request.Name, createSiteAddressResult.Value);
             if (createSiteResult.IsFailure)
                 return createSiteResult;
             var newSite = createSiteResult.Value;

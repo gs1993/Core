@@ -18,12 +18,10 @@ namespace WebApi.Domain.Commands
     public class AddOrderItemCommandHandler : IRequestHandler<AddOrderItemCommand, Result>
     {
         private readonly DataContext _context;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public AddOrderItemCommandHandler(DataContext context, IDateTimeProvider dateTimeProvider)
+        public AddOrderItemCommandHandler(DataContext context)
         {
             _context = context;
-            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<Result> Handle(AddOrderItemCommand request, CancellationToken cancellationToken)
@@ -41,7 +39,7 @@ namespace WebApi.Domain.Commands
             if (productToAdd == null)
                 return Result.Failure("Product not found");
 
-            var addOrderItemResult = order.AddOrderItem(productToAdd, request.Quantity, _dateTimeProvider.Now);
+            var addOrderItemResult = order.AddOrderItem(productToAdd, request.Quantity);
             if (addOrderItemResult.IsFailure)
                 return addOrderItemResult;
 

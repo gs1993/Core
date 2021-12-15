@@ -24,7 +24,7 @@ namespace WebApi.Entities.Accounts
 
 
         protected Account() { }
-        private Account(Name name, Email email, Password password, Role role, string verificationToken, DateTime createDate) : base(createDate)
+        private Account(Name name, Email email, Password password, Role role, string verificationToken)
         {
             Name = name;
             Email = email;
@@ -33,9 +33,9 @@ namespace WebApi.Entities.Accounts
             VerificationToken = verificationToken;
         }
 
-        public static Result<Account> Create(Name name, Email email, Password password, Role role, string verificationToken, DateTime created)
+        public static Result<Account> Create(Name name, Email email, Password password, Role role, string verificationToken)
         {
-            return Result.Success(new Account(name, email, password, role, verificationToken, created));
+            return Result.Success(new Account(name, email, password, role, verificationToken));
         }
 
 
@@ -73,13 +73,10 @@ namespace WebApi.Entities.Accounts
             ResetTokenExpires = null;
         }
 
-        public void Update(Name name, DateTime updateDate)
+        public void Update(Name name)
         {
             if (name != null && Name != name)
-            {
                 Name = name;
-                LastUpdateDate = updateDate;
-            }
         }
 
         public void ChangeRole(Role role)

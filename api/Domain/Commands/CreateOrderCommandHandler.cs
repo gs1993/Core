@@ -31,12 +31,10 @@ namespace WebApi.Domain.Commands
     public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<long>>
     {
         private readonly DataContext _context;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public CreateOrderCommandHandler(DataContext context, IDateTimeProvider dateTimeProvider)
+        public CreateOrderCommandHandler(DataContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
         public async Task<Result<long>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -56,8 +54,7 @@ namespace WebApi.Domain.Commands
             if (phoneNumberResult.IsFailure)
                 return Result.Failure<long>(phoneNumberResult.Error);
 
-            var orderCreateDate = _dateTimeProvider.Now;
-            var orderResult = Order.Create(emailResult.Value, phoneNumberResult.Value, nameResult.Value, orderCreateDate);
+            var orderResult = Order.Create(emailResult.Value, phoneNumberResult.Value, nameResult.Value);
             if (orderResult.IsFailure)
                 return Result.Failure<long>(orderResult.Error);
 
@@ -66,7 +63,7 @@ namespace WebApi.Domain.Commands
             foreach (var orderItem in request.OrderItems)
             {
                 var product = products.FirstOrDefault(x => x.Id == orderItem.ProductId);
-                var addOrderItemResult = order.AddOrderItem(product, orderItem.Quantity, orderCreateDate);
+                var addOrderItemResult = order.AddOrderItem(product, orderItem.Quantity);
                 if (addOrderItemResult.IsFailure)
                     return Result.Failure<long>(addOrderItemResult.Error);
             }

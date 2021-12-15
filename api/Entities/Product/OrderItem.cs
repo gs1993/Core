@@ -11,7 +11,7 @@ namespace WebApi.Entities.Product
         public int Quantity { get; private set; }
 
         protected OrderItem() { }
-        public OrderItem(Product product, Order order, int quantity, DateTime createDate) : base(createDate)
+        public OrderItem(Product product, Order order, int quantity)
         {
             Product = product;
             Order = order;

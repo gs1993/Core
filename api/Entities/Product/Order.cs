@@ -21,7 +21,7 @@ namespace WebApi.Entities.Product
 
 
         protected Order() { }
-        private Order(Email email, PhoneNumber phoneNumber, Name name, DateTime createDate) : base(createDate)
+        private Order(Email email, PhoneNumber phoneNumber, Name name)
         {
             Email = email;
             Name = name;
@@ -32,10 +32,8 @@ namespace WebApi.Entities.Product
             OrderState = OrderState.PaymentNew;
         }
 
-        public static Result<Order> Create(Email email, PhoneNumber phoneNumber, Name name, DateTime createDate)
+        public static Result<Order> Create(Email email, PhoneNumber phoneNumber, Name name)
         {
-            if(createDate == default)
-                return Result.Failure<Order>("Create date cannot be empty");
             if (email == null)
                 return Result.Failure<Order>("Email cannot be empty");
             if (name == null)
@@ -43,11 +41,11 @@ namespace WebApi.Entities.Product
             if (phoneNumber == null)
                 return Result.Failure<Order>("Email cannot be empty");
 
-            return Result.Success(new Order(email, phoneNumber, name, createDate));
+            return Result.Success(new Order(email, phoneNumber, name));
         }
 
         
-        public Result AddOrderItem(Product product, int quantity, DateTime createDate)
+        public Result AddOrderItem(Product product, int quantity)
         {
             if (product == null)
                 return Result.Failure("Invalid product");
@@ -62,7 +60,7 @@ namespace WebApi.Entities.Product
 
             var existingOrderItem = _orderItems.FirstOrDefault(x => x.Product == product);
             if (existingOrderItem == null)
-                _orderItems.Add(new OrderItem(product, this, quantity, createDate));
+                _orderItems.Add(new OrderItem(product, this, quantity));
             else
                 existingOrderItem.AddQuantity(quantity);
 

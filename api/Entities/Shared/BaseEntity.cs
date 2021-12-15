@@ -6,14 +6,18 @@ namespace WebApi.Entities.Shared
     public abstract class BaseEntity : Entity
     {
         public DateTime CreateDate { get; private set; }
-        public DateTime? LastUpdateDate { get; protected set; }
+        public DateTime? LastUpdateDate { get; private set; }
         public bool IsDeleted { get; private set; }
         public DateTime? DeleteDate { get; private set; }
 
-        protected BaseEntity() { }
-        protected BaseEntity(DateTime createdDate)
+        public void SetCreateDate(DateTime createDate)
         {
-            CreateDate = createdDate;
+            CreateDate = createDate;
+        }
+
+        public void SetUpdateDate(DateTime updateDate)
+        {
+            LastUpdateDate = updateDate;
         }
 
         public void Delete(DateTime deleteDate)

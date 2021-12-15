@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using WebApi.Entities.Accounts;
 using WebApi.Entities.Product;
 using WebApi.Entities.Shared;
@@ -9,16 +14,22 @@ namespace WebApi.Helpers
 {
     public class DataContext : DbContext
     {
+        private readonly IDateTimeProvider _dateTimeProvider;
+
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Site> Sites { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
 
-        public DataContext(DbContextOptions options) : base(options) { }
+        public DataContext(DbContextOptions options, IDateTimeProvider dateTimeProvider) : base(options)
+        {
+            _dateTimeProvider = dateTimeProvider;
+        }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Account>(x => 
+            modelBuilder.Entity<Account>(x =>
             {
                 x.ToTable("Accounts").HasKey(k => k.Id);
                 x.HasQueryFilter(x => !x.IsDeleted);
@@ -40,7 +51,7 @@ namespace WebApi.Helpers
                     .HasConversion(p => p.Value, p => Email.Create(p).Value);
             });
 
-            modelBuilder.Entity<RefreshToken>(x => 
+            modelBuilder.Entity<RefreshToken>(x =>
             {
                 x.ToTable("RefreshTokens").HasKey(k => k.Id);
             });
@@ -125,12 +136,75 @@ namespace WebApi.Helpers
                     .AddConsole();
             });
 
-            //if (_useConsoleLogger)
-            //{
-                optionsBuilder
-                    .UseLoggerFactory(loggerFactory)
-                    .EnableSensitiveDataLogging();
-            //}
+            optionsBuilder
+                .UseLoggerFactory(loggerFactory)
+                .EnableSensitiveDataLogging();
         }
+
+        #region InfrastructureMethods
+        public override EntityEntry<TEntity> Add<TEntity>(TEntity entity)
+        {
+            throw new InvalidOperationException("Use attach to add new entity");
+        }
+
+        public override ValueTask<EntityEntry<TEntity>> AddAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("Use attach to add new entity");
+        }
+
+        public override EntityEntry Add(object entity)
+        {
+            throw new InvalidOperationException("Use attach to add new entity");
+        }
+
+        public override ValueTask<EntityEntry> AddAsync(object entity, CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("Use attach to add new entity");
+        }
+
+        public override EntityEntry<TEntity> Remove<TEntity>(TEntity entity)
+        {
+            (entity as BaseEntity).Delete(_dateTimeProvider.Now);
+            return null;
+        }
+
+        public override int SaveChanges()
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is BaseEntity 
+                   && (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+            foreach (var entityEntry in entries)
+            {
+                if (entityEntry.State == EntityState.Added)
+                    ((BaseEntity)entityEntry.Entity).SetCreateDate(_dateTimeProvider.Now);
+                else if(entityEntry.State == EntityState.Modified)
+                    ((BaseEntity)entityEntry.Entity).SetUpdateDate(_dateTimeProvider.Now);
+            }
+
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is BaseEntity
+                   && (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+            var dateNow = _dateTimeProvider.Now;
+            foreach (var entityEntry in entries)
+            {
+                if (entityEntry.State == EntityState.Added)
+                    ((BaseEntity)entityEntry.Entity).SetCreateDate(dateNow);
+                else if (entityEntry.State == EntityState.Modified)
+                    ((BaseEntity)entityEntry.Entity).SetUpdateDate(dateNow);
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        #endregion
     }
 }

@@ -121,7 +121,7 @@ namespace WebApi.Services
             var role = _context.Accounts.Any() ? Role.User : Role.Admin;
 
             var createAccountResult = Account.Create(nameResult.Value, emailResult.Value,
-                passwordResult.Value, role, verificationToken, DateTime.UtcNow);
+                passwordResult.Value, role, verificationToken);
             if (createAccountResult.IsFailure)
                 throw new AppException(createAccountResult.Error);
 
@@ -205,7 +205,7 @@ namespace WebApi.Services
             if (newNameResult.IsFailure)
                 throw new AppException(newNameResult.Error);
 
-            account.Update(newNameResult.Value, DateTime.UtcNow);
+            account.Update(newNameResult.Value);
             _context.Accounts.Update(account);
             _context.SaveChanges();
 
