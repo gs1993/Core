@@ -1,188 +1,435 @@
 {
 	"info": {
-		"_postman_id": "d3e2eb8c-8359-45f9-a8aa-58d793621a35",
+		"_postman_id": "6a5e87cb-5ea5-4806-ac41-9daa362aca5b",
 		"name": "WebApi",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "register",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"title\": \"Mr\",\r\n    \"firstName\": \"Grzegorz\",\r\n    \"lastName\": \"Sawiński\",\r\n    \"email\": \"grzegorz.sawinski93@gmail.com\",\r\n    \"password\": \"Test123\",\r\n    \"confirmPassword\": \"Test123\",\r\n    \"acceptTerms\": true\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Products",
+			"item": [
+				{
+					"name": "Add Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test 4\",\r\n    \"description\": \"Testowy produkt 3\",\r\n    \"quantity\": 1,\r\n    \"price\": 150,\r\n    \"currency\": \"PLN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/product/create",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product",
+								"create"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "https://{{url}}/accounts/register",
-					"protocol": "https",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"accounts",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "verify-email",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"token\": \"D55F65C066387B9482D8CA491E833BE03CA1159A07DDB90CB7B7879C05A01DCFBB4C1ABB88296927\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Get Products",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/product",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product"
+							]
 						}
-					}
-				},
-				"url": {
-					"raw": "https://localhost:5001/accounts/verify-email",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "5001",
-					"path": [
-						"accounts",
-						"verify-email"
-					]
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "authenticate",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"grzegorz.sawinski93@gmail.com\",\r\n    \"password\": \"Test123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Add Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2Mzc4Njk5MjUsImV4cCI6MTYzNzg3NzEyNSwiaWF0IjoxNjM3ODY5OTI1fQ.YN10Im0Bw4tlC5GSXWnWoZ0TTmcgYizoWAtSA7ouc8E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"adam.padam@gmail.com\",\r\n  \"phoneNumber\": \"9302 2031\",\r\n  \"phoneNumberCountryOrderCode\": \"+48\",\r\n  \"firstName\": \"Jan\",\r\n  \"lastName\": \"Kowalski\",\r\n  \"orderItems\": [\r\n    {\r\n      \"productId\": 1,\r\n      \"quantity\": 10\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/order/create",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "https://localhost:5001/accounts/authenticate",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "5001",
-					"path": [
-						"accounts",
-						"authenticate"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "accounts",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzU2OTUxODQsImV4cCI6MTYzNTY5NjA4NCwiaWF0IjoxNjM1Njk1MTg0fQ.EF6nXS93WZiMnPyJQzyDZo1c8BlmUcVKo83kwtooRGs",
-							"type": "string"
+				{
+					"name": "Add Order Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2Mzc1MjkzOTksImV4cCI6MTYzNzUzNjU5OSwiaWF0IjoxNjM3NTI5Mzk5fQ.NDROCJGzrulZhrXLUpI0Z6m-xgoWhRbRphXc-qK61ec",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productId\": 1,\r\n    \"quantity\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/order/AddOrderItem/3",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"order",
+								"AddOrderItem",
+								"3"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:5001/accounts",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "5001",
-					"path": [
-						"accounts"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "change-role",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": null
-			},
-			"response": []
-		},
-		{
-			"name": "refresh-token",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": null
-			},
-			"response": []
-		},
-		{
-			"name": "AddSite",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"site 1\",\r\n  \"addressFirstLine\": \"Marszałkowska 1/124\",\r\n  \"addressSecondLine\": \"00-223 Warszawa\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Get Orders",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/order",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"order"
+							]
 						}
-					}
-				},
-				"url": {
-					"raw": "https://{{url}}/site/add",
-					"protocol": "https",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"site",
-						"add"
-					]
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "GetSite",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://{{url}}/site",
-					"protocol": "https",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"site"
-					]
+			"name": "Site",
+			"item": [
+				{
+					"name": "Add Site",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"site 1\",\r\n  \"addressFirstLine\": \"Marszałkowska 1/124\",\r\n  \"addressSecondLine\": \"00-223 Warszawa\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/site/add",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"site",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sites",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{url}}/site",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"site"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Mr\",\r\n    \"firstName\": \"Grzegorz\",\r\n    \"lastName\": \"Sawiński\",\r\n    \"email\": \"grzegorz.sawinski93@gmail.com\",\r\n    \"password\": \"Test123\",\r\n    \"confirmPassword\": \"Test123\",\r\n    \"acceptTerms\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/accounts/register",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"accounts",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "verify-email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"token\": \"D55F65C066387B9482D8CA491E833BE03CA1159A07DDB90CB7B7879C05A01DCFBB4C1ABB88296927\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/accounts/verify-email",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"accounts",
+								"verify-email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "authenticate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"grzegorz.sawinski93@gmail.com\",\r\n    \"password\": \"Test123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{url}}/accounts/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"accounts",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "accounts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:5001/accounts",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change-role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh-token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Initiate Payment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://{{url}}/payment/initiatePayment/3",
+							"protocol": "https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payment",
+								"initiatePayment",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }

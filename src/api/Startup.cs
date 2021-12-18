@@ -44,7 +44,7 @@ namespace WebApi
 
             ConfigurePaymentGateway(services);
 
-            services.AddMediatR(typeof(Startup).Assembly);
+            services.AddMediatR(typeof(DataContext).Assembly);
         }
 
         public void Configure(IApplicationBuilder app)
