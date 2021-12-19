@@ -19,8 +19,8 @@
 * Easly to split into WRITE and READ databases
 
 ### External services integration
-* (Payment gateway service)[https://github.com/gs1993/Core/blob/master/src/serviceAccess/PayuGateway/PayuGatewayPaymentService.cs]
-* (Currency conversion service)[]
+* [Payment gateway service](https://github.com/gs1993/Core/blob/master/src/serviceAccess/PayuGateway/PayuGatewayPaymentService.cs)
+* [Currency conversion service]()
 
 --------------
 
