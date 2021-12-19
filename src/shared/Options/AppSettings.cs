@@ -33,4 +33,9 @@ namespace Shared.Options
         public string SmtpUser { get; init; }
         public string SmtpPass { get; init; }
     }
+
+    public record QueryConnectionString
+    {
+        public string ConnectionString { get; init; }
+    }
 }

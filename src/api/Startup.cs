@@ -75,7 +75,11 @@ namespace WebApi
                 .UseSqlServer(connectionString)
                 .UseLazyLoadingProxies()
             );
-            services.AddTransient<IReadonlyDataContext, ReadonlyDataContext>();
+            services.AddSingleton(new QueryConnectionString
+            {
+                ConnectionString = Configuration.GetConnectionString("WebApiReadonlyDatabase")
+            });
+            services.AddTransient<IReadOnlyDataContext, ReadOnlyDataContext>();
         }
 
         private void ConfigurePaymentGateway(IServiceCollection services)

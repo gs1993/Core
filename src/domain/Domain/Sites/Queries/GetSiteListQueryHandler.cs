@@ -17,9 +17,9 @@ namespace Domain.Sites.Queries
 
     public class GetSiteListQueryHandler : IRequestHandler<GetSiteListQuery, IReadOnlyList<SiteDto>>
     {
-        private readonly IReadonlyDataContext _readonlyDataContext;
+        private readonly IReadOnlyDataContext _readonlyDataContext;
 
-        public GetSiteListQueryHandler(IReadonlyDataContext readonlyDataContext)
+        public GetSiteListQueryHandler(IReadOnlyDataContext readonlyDataContext)
         {
             _readonlyDataContext = readonlyDataContext ?? throw new ArgumentNullException(nameof(readonlyDataContext));
         }

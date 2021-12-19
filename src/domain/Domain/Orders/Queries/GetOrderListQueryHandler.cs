@@ -23,9 +23,9 @@ namespace Domain.Orders.Queries
 
     public class GetOrderListQueryHandler : IRequestHandler<GetOrderListQuery, IReadOnlyList<OrderDto>>
     {
-        private readonly IReadonlyDataContext _readonlyDataContext;
+        private readonly IReadOnlyDataContext _readonlyDataContext;
 
-        public GetOrderListQueryHandler(IReadonlyDataContext readonlyDataContext)
+        public GetOrderListQueryHandler(IReadOnlyDataContext readonlyDataContext)
         {
             _readonlyDataContext = readonlyDataContext ?? throw new ArgumentNullException(nameof(readonlyDataContext));
         }

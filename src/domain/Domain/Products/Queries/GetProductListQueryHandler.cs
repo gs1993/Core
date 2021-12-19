@@ -23,9 +23,9 @@ namespace Domain.Products.Queries
 
     public class GetProductListQueryHandler : IRequestHandler<GetProductListQuery, IReadOnlyList<ProductDto>>
     {
-        private readonly IReadonlyDataContext _readonlyDataContext;
+        private readonly IReadOnlyDataContext _readonlyDataContext;
 
-        public GetProductListQueryHandler(IReadonlyDataContext readonlyDataContext)
+        public GetProductListQueryHandler(IReadOnlyDataContext readonlyDataContext)
         {
             _readonlyDataContext = readonlyDataContext ?? throw new ArgumentNullException(nameof(readonlyDataContext));
         }

@@ -18,10 +18,10 @@ namespace Domain.Shared.DatabaseContext
     {
         private readonly IDateTimeProvider _dateTimeProvider;
 
-        public DbSet<Account> Accounts { get; set; }
-        public DbSet<Site> Sites { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Order> Orders { get; set; }
+        public DbSet<Account> Accounts { get; protected set; }
+        public DbSet<Site> Sites { get; protected set; }
+        public DbSet<Product> Products { get; protected set; }
+        public DbSet<Order> Orders { get; protected set; }
 
         public DataContext(DbContextOptions options, IDateTimeProvider dateTimeProvider) : base(options)
         {

@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Shared.Options;
 using System.Linq;
 
 namespace Domain.Shared.DatabaseContext
 {
-    public interface IReadonlyDataContext
+    public interface IReadOnlyDataContext
     {
         TEntity Get<TEntity>(long id) where TEntity : BaseEntity;
         IQueryable<TEntity> GetQuery<TEntity>() where TEntity : BaseEntity;
@@ -11,13 +12,14 @@ namespace Domain.Shared.DatabaseContext
         TEntity GetWithDeleted<TEntity>(long id) where TEntity : BaseEntity;
     }
 
-    public class ReadonlyDataContext : IReadonlyDataContext
+    public class ReadOnlyDataContext : IReadOnlyDataContext
     {
         private readonly DataContext _context;
 
-        public ReadonlyDataContext(DataContext context)
+        public ReadOnlyDataContext(DataContext context, QueryConnectionString queryConnectionString)
         {
-            _context = context; //TODO: change connection string for queries
+            _context = context;
+            _context.Database.SetConnectionString(queryConnectionString.ConnectionString);
         }
 
         public IQueryable<TEntity> GetQuery<TEntity>() where TEntity : BaseEntity
