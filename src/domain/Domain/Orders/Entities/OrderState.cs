@@ -38,7 +38,7 @@ namespace Domain.Orders.Entities
 
         public static OrderState PaymentNew => new(OrderStateEnum.Created);
 
-        public static OrderState PaymentStarted(OrderState previousState, DateTime paymentStartDate)
+        public static OrderState OrderSubmitted(OrderState previousState, DateTime paymentStartDate)
         {
             if (previousState.Value != OrderStateEnum.Created)
                 throw new InvalidOperationException();

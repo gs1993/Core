@@ -89,9 +89,9 @@ namespace Domain.Orders.Entities
             return Result.Success();
         }
 
-        public void SetPaymentStarted(DateTime paymentStartDate)
+        public void SetOrderSybmitted(DateTime paymentStartDate)
         {
-            OrderState = OrderState.PaymentStarted(OrderState, paymentStartDate);
+            OrderState = OrderState.OrderSubmitted(OrderState, paymentStartDate);
         }
 
         public void SetPaymentInProgress(DateTime paymentInProgressDate)

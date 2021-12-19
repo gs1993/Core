@@ -13,25 +13,25 @@ using System.Threading.Tasks;
 
 namespace Domain.Orders.Commands
 {
-    public record InitiatePaymentCommand : IRequest<Result<string>>
+    public record SubmitOrderCommand : IRequest<Result<string>>
     {
         public long OrderId { get; init; }
     }
 
-    public class InitiatePaymentCommandHandler : IRequestHandler<InitiatePaymentCommand, Result<string>>
+    public class SubmitOrderCommandHandler : IRequestHandler<SubmitOrderCommand, Result<string>>
     {
         private readonly DataContext _context;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPaymentGateway _paymentGateway;
 
-        public InitiatePaymentCommandHandler(DataContext context, IDateTimeProvider dateTimeProvider, IPaymentGateway paymentGateway)
+        public SubmitOrderCommandHandler(DataContext context, IDateTimeProvider dateTimeProvider, IPaymentGateway paymentGateway)
         {
             _context = context;
             _dateTimeProvider = dateTimeProvider;
             _paymentGateway = paymentGateway;
         }
 
-        public async Task<Result<string>> Handle(InitiatePaymentCommand request, CancellationToken cancellationToken)
+        public async Task<Result<string>> Handle(SubmitOrderCommand request, CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -42,7 +42,7 @@ namespace Domain.Orders.Commands
             if (order == null)
                 return Result.Failure<string>("Order not found");
 
-            order.SetPaymentStarted(_dateTimeProvider.Now);
+            order.SetOrderSybmitted(_dateTimeProvider.Now);
             await _context.SaveChangesAsync(cancellationToken);
 
             var transactionDto = CreateTransactionDto(order);

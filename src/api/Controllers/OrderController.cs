@@ -76,5 +76,19 @@ namespace WebApi.Controllers
 
             return FromResult(addOrderItemResult);
         }
+
+        [HttpPost("SubmitOrder/{orderId}")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Order processed successfully")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(string))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, type: typeof(string))]
+        public async Task<IActionResult> SubmitOrder(long orderId, CancellationToken cancellationToken)
+        {
+            var paymentResult = await _mediator.Send(new SubmitOrderCommand
+            {
+                OrderId = orderId
+            }, cancellationToken);
+
+            return FromResult(paymentResult);
+        }
     }
 }
