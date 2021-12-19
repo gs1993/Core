@@ -25,62 +25,49 @@ namespace PayuGateway
             _api = api;
         }
 
-        public async Task<Result<string>> Sale(TransactionDto dto, CancellationToken cancellationToken)
+        public async Task<Result<string>> SubmitOrder(TransactionDto dto, CancellationToken cancellationToken)
         {
-            try
-            {
-                var authorizationeResult = await Authorize(cancellationToken);
-                if (authorizationeResult.IsFailure)
-                    return Result.Failure<string>(authorizationeResult.Error);
+            var authorizationeResult = await Authorize(cancellationToken);
+            if (authorizationeResult.IsFailure)
+                return Result.Failure<string>(authorizationeResult.Error);
 
-                string bearerToken = authorizationeResult.Value.AccessToken;
-                var createOrderResponse = await _api.CreateOrder(new CreateOrderDto
-                {
-                    CustomerIp = "127.0.0.1",
-                    CustomerId = _settings.ClientId,
-                    MerchantPosId = _settings.PosId,
-                    Description = "Test",
-                    TotalAmount = (int)(dto.TotalAmount * 100),
-                    CurrencyCode = dto.CurrencyCode,
-                    Buyer = new CreateOrderDto.BuyerDto
-                    {
-                        Email = dto.Email,
-                        Phone = dto.Phone,
-                        FirstName = dto.FirstName,
-                        LastName = dto.LastName,
-                        Language = dto.Language
-                    },
-                    Products = dto.Products.Select(x => new CreateOrderDto.ProductsDto
-                    {
-                        Name = x.Name,
-                        Quantity = x.Quantity,
-                        UnitPrice = (int)(x.UnitPrice * 100)
-                    })
-                }, bearerToken, cancellationToken);
+            var response = await SendOrder(dto, authorizationeResult.Value.AccessToken, cancellationToken);
+            if (response.StatusCode == System.Net.HttpStatusCode.Found)
+                return DeserializeSuccessRedirect(response);
+            if (!response.IsSuccessStatusCode)
+                return Result.Failure<string>(GetErrorMessage(response.Error));
 
-                if (createOrderResponse.StatusCode == System.Net.HttpStatusCode.Found)
-                {
-                    var redirectResponse = JsonSerializer.Deserialize<CreateOrderResponseDto>(createOrderResponse.Error.Content);
-                    if (redirectResponse?.Status?.StatusCode == "SUCCESS")
-                        return Result.Success(redirectResponse.RedirectUri);
-                }
-                if (!createOrderResponse.IsSuccessStatusCode)
-                    return Result.Failure<string>(GetErrorMessage(createOrderResponse.Error));
-
-                return Result.Success(createOrderResponse.Content.RedirectUri);
-            }
-            catch (Exception e)
-            {
-                return Result.Failure<string>(e.Message);
-            }
+            return Result.Success(response.Content.RedirectUri);
         }
 
-        public Task<SetupNewPaymentDto> SetupNewPayment(CancellationToken cancellationToken)
+
+        private Task<ApiResponse<CreateOrderResponseDto>> SendOrder(TransactionDto dto, string bearerToken, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return _api.CreateOrder(new CreateOrderDto
+            {
+                CustomerIp = "127.0.0.1",
+                CustomerId = _settings.ClientId,
+                MerchantPosId = _settings.PosId,
+                Description = "Sale Order",
+                TotalAmount = (int)(dto.TotalAmount * 100),
+                CurrencyCode = dto.CurrencyCode,
+                Buyer = new CreateOrderDto.BuyerDto
+                {
+                    Email = dto.Email,
+                    Phone = dto.Phone,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    Language = dto.Language
+                },
+                Products = dto.Products.Select(x => new CreateOrderDto.ProductsDto
+                {
+                    Name = x.Name,
+                    Quantity = x.Quantity,
+                    UnitPrice = (int)(x.UnitPrice * 100)
+                })
+            }, bearerToken, cancellationToken);
         }
 
-        //TODO: cache method result
         private async Task<Result<PayuAuthResponseDto>> Authorize(CancellationToken cancellationToken)
         {
             var authorizeData = new Dictionary<string, object>()
@@ -94,6 +81,15 @@ namespace PayuGateway
                 return Result.Failure<PayuAuthResponseDto>(authorizationResponse.Error.Message);
 
             return Result.Success(authorizationResponse.Content);
+        }
+
+        private static Result<string> DeserializeSuccessRedirect(ApiResponse<CreateOrderResponseDto> response)
+        {
+            var redirectResponse = JsonSerializer.Deserialize<CreateOrderResponseDto>(response.Error.Content);
+            if (redirectResponse?.Status?.StatusCode != "SUCCESS")
+                throw new InvalidCastException("Cannot process payment gateway response");
+
+            return Result.Success(redirectResponse.RedirectUri);
         }
 
         private static string GetErrorMessage(ApiException exception)

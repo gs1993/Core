@@ -75,12 +75,13 @@ namespace Domain.Orders.Commands
             return Result.Success(order.Id);
         }
 
-        private async Task<List<Product>> GetOrderedProducts(CreateOrderCommand request, CancellationToken cancellationToken)
+
+        private Task<List<Product>> GetOrderedProducts(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             var productIds = request.OrderItems
                 .Select(x => x.ProductId);
 
-            return await _context.Products
+            return _context.Products
                 .Where(x => productIds.Contains(x.Id))
                 .ToListAsync(cancellationToken: cancellationToken);
         }

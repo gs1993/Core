@@ -36,30 +36,50 @@ namespace Domain.Orders.Commands
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            var order = await _context.Orders
-                .Include(x => x.OrderItems)
-                .SingleOrDefaultAsync(x => x.Id == request.OrderId && x.OrderState.Value == OrderStateEnum.Created, cancellationToken: cancellationToken);
+            var order = await GetOrder(request.OrderId, cancellationToken);
             if (order == null)
                 return Result.Failure<string>("Order not found");
 
-            order.SetOrderSybmitted(_dateTimeProvider.Now);
-            await _context.SaveChangesAsync(cancellationToken);
+            await SetOrderSubmitted(order, cancellationToken);
 
             var transactionDto = CreateTransactionDto(order);
-            var paymentResult = await _paymentGateway.Sale(transactionDto, cancellationToken);
+            var paymentResult = await _paymentGateway.SubmitOrder(transactionDto, cancellationToken);
             if (paymentResult.IsFailure)
             {
-                order.SetPaymentError(_dateTimeProvider.Now);
-                await _context.SaveChangesAsync(cancellationToken);
+                await SetPaymentError(order, cancellationToken);
                 return Result.Failure<string>(paymentResult.Error);
             }
 
-            order.SetPaymentInProgress(_dateTimeProvider.Now);
-            await _context.SaveChangesAsync(cancellationToken);
+            await SetPaymentInProgress(order, cancellationToken);
 
             return Result.Success(paymentResult.Value);
         }
 
+
+        private Task<Order> GetOrder(long orderId, CancellationToken cancellationToken)
+        {
+            return _context.Orders
+                .Include(x => x.OrderItems)
+                .SingleOrDefaultAsync(x => x.Id == orderId && x.OrderState.Value == OrderStateEnum.Created, cancellationToken: cancellationToken);
+        }
+
+        private Task SetPaymentError(Order order, CancellationToken cancellationToken)
+        {
+            order.SetPaymentError(_dateTimeProvider.Now);
+            return _context.SaveChangesAsync(cancellationToken);
+        }
+
+        private Task SetPaymentInProgress(Order order, CancellationToken cancellationToken)
+        {
+            order.SetPaymentInProgress(_dateTimeProvider.Now);
+            return _context.SaveChangesAsync(cancellationToken);
+        }
+
+        private Task SetOrderSubmitted(Order order, CancellationToken cancellationToken)
+        {
+            order.SetOrderSubmitted(_dateTimeProvider.Now);
+            return _context.SaveChangesAsync(cancellationToken);
+        }
 
         private static TransactionDto CreateTransactionDto(Order order)
         {
