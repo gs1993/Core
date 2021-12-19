@@ -6,11 +6,10 @@
 
 # Features
 ### Optimized data schemas
-* [EF core](https://github.com/dotnet/efcore) - 
-- [DataContext]() for writes, DDD support (Value Objects, domain model rules validation, persistence ignorance)
-- [IReadOnlyDatabaseContext]() for reads, only read collections exposed
+* [DataContext](https://github.com/gs1993/Core/blob/master/src/domain/Domain/Shared/DatabaseContext/DataContext.cs) for writes, DDD support (Value Objects, domain model rules validation, persistence ignorance)
+* [IReadOnlyDatabaseContext](https://github.com/gs1993/Core/blob/master/src/domain/Domain/Shared/DatabaseContext/ReadonlyDataContext.cs) for reads, only read collections exposed
 
-### Separation of concerns
+### CQRS
 * Segregating the read and write sides mean maintainable and flexible models. Most of the complex business logic goes into the write model. The read model can be relatively simple.
 
 ### Security
@@ -18,6 +17,10 @@
 
 ### Independent scaling 
 * Easly to split into WRITE and READ databases
+
+### External services integration
+* (Payment gateway service)[https://github.com/gs1993/Core/blob/master/src/serviceAccess/PayuGateway/PayuGatewayPaymentService.cs]
+* (Currency conversion service)[]
 
 --------------
 
